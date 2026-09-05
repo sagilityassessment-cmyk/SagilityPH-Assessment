@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sagility Remote Assessment</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- BACKGROUND DESIGN ELEMENTS -->
+  <div class="bg-decoration bg-top-left">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bgGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#39b8ff;stop-opacity:0.15" />
+          <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.1" />
+        </linearGradient>
+      </defs>
+      <circle cx="80" cy="80" r="120" fill="url(#bgGrad1)"/>
+      <circle cx="200" cy="-50" r="100" fill="url(#bgGrad1)" opacity="0.6"/>
+    </svg>
+  </div>
+  
+  <div class="bg-decoration bg-bottom-right">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.12" />
+          <stop offset="100%" style="stop-color:#4d7cff;stop-opacity:0.08" />
+        </linearGradient>
+      </defs>
+      <circle cx="320" cy="320" r="150" fill="url(#bgGrad2)"/>
+      <circle cx="200" cy="400" r="120" fill="url(#bgGrad2)" opacity="0.6"/>
+    </svg>
+  </div>
+
+  <!-- HEADER -->
+  <header class="top">
+    <div class="logo">
+      <img src="logo.png" alt="Sagility Logo" class="logo-img">
+    </div>
+    <div class="header-text-box">
+      <h1>REMOTE / VIRTUAL <span>ASSESSMENT</span></h1>
+      <p>This tool is designed for remote and virtual assessments. It is intended for internal use only. Only authorized Sagility Test Admin are permitted to use this tool.</p>
+      <p class="header-credit">Created by Richiel Caña</p>
+    </div>
+    <nav>
+      <a href="#reports">Reports</a>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT GRID -->
+  <main class="grid">
+    <!-- LEFT SIDE: CANDIDATE INFORMATION -->
+    <section class="card">
+      <h2>Candidate Information</h2>
+      <div class="form-group">
+        <label class="form-label">
+          <svg class="form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Name
+        </label>
+        <input id="candidateNameInput" type="text" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          <svg class="form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="m22 7-10 5L2 7"></path>
+          </svg>
+          Email
+        </label>
+        <input id="emailInput" type="email" placeholder="Email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          <svg class="form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          Location
+        </label>
+        <select id="locationInput">
+          <option>Select Location</option>
+          <option>Iloilo City</option>
+          <option>Bohol</option>
+          <option>Alabang</option>
+          <option>Quezon City</option>
+        </select>
+        <button id="clearDataBtn" class="clear-data-btn" type="button">Clear Data</button>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDE: SELECTED PACKAGES -->
+    <div class="right-column">
+      <!-- SELECTED PACKAGES CARD -->
+      <section class="card selected-packages-card">
+        <div class="card-header">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+          </svg>
+          <h2>Selected Packages</h2>
+        </div>
+        <div id="selectedPackagesContainer" class="selected-packages-scroll"></div>
+        <button id="sendEmailBtn" class="send-email-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
+            <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Send Email
+        </button>
+        <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card sent-history-card">
+        <div class="card-header">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"></circle>
+            <polyline points="12 7 12 12 15 14"></polyline>
+          </svg>
+          <h2>History Data</h2>
+        </div>
+        <input id="historySearchInput" class="history-search-input" type="search" placeholder="Search name, email, or location">
+        <ol id="sentHistoryList" class="sent-history-list"></ol>
+      </section>
+    </div>
+  </main>
+
+  <!-- FULL WIDTH ASSESSMENT PACKAGES -->
+  <section class="card assessment-packages-full">
+    <h2>Assessment Packages</h2>
+    <p class="packages-subtitle">Select one or more packages for assessment</p>
+    
+    <div class="categories-wrapper">
+      <!-- Level 1 -->
+      <div class="packages-category">
+        <h3 class="category-title">Assessment Level 1</h3>
+        <div class="packages-list" id="packagesList-level1">
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Workday Assessment Level 1" data-color="blue" data-url="https://journey.harver-us.com/vacancy/680a85c5678d2a49a06c94d3">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Workday Assessment Level 1</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Standalone Assessment Level 1" data-color="green" data-url="https://journey.harver-us.com/vacancy/67dc5093f62d0c4018a3e8e9">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Standalone Assessment Level 1</span>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Level 2 -->
+      <div class="packages-category">
+        <h3 class="category-title">Assessment level 2</h3>
+        <div class="packages-list" id="packagesList-level2">
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 2 Spoken B2, English B1" data-color="blue" data-url="https://journey.harver-us.com/vacancy/680f51a8527167ce829a04dc">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 2 Spoken B2, English B1</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 2 Spoken B1, English B1" data-color="purple" data-url="https://journey.harver-us.com/vacancy/680fa6ba527167ce829a0660">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 2 Spoken B1, English B1</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 2 Spoken B2, English B1, Typing" data-color="green" data-url="https://journey.harver-us.com/vacancy/680f58fe527167ce829a04f3">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 2 Spoken B2, English B1, Typing</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 2 Spoken B2, English B2, Typing" data-color="blue" data-url="https://journey.harver-us.com/vacancy/680f7607527167ce829a05bf">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 2 Spoken B2, English B2, Typing</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 2 Spoken B2, English, Typing, RNT" data-color="purple" data-url="https://journey.harver-us.com/vacancy/680f74a0527167ce829a057a">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 2 Spoken B2, English, Typing, RNT</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="English, Typing, RNT" data-color="green" data-url="https://journey.harver-us.com/vacancy/680f7781527167ce829a0628">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">English, Typing, RNT</span>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Standalone -->
+      <div class="packages-category">
+        <h3 class="category-title">Assessment Standalone</h3>
+        <div class="packages-list" id="packagesList-standalone">
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Spoken Language Proficiency - B1/B2" data-color="purple" data-url="https://journey.harver-us.com/vacancy/67e314c6fdb051af4a247646">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Spoken Language Proficiency - B1/B2</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Spoken Language Proficiency - B2/C1" data-color="green" data-url="https://journey.harver-us.com/vacancy/67e6f0f3f2d06a81c622b793">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Spoken Language Proficiency - B2/C1</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="English Language Proficiency" data-color="blue" data-url="https://journey.harver-us.com/vacancy/67e85fd6f2d06a81c622b861">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">English Language Proficiency</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="PH - Standalone Typing Assessment" data-color="purple" data-url="https://journey.harver-us.com/vacancy/67e86c60f2d06a81c622b88e">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">PH - Standalone Typing Assessment</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Standalone Computer Proficiency Test" data-color="green" data-url="https://journey.harver-us.com/vacancy/67e9eb45f2d06a81c622b8a3">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Standalone Computer Proficiency Test</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Spanish" data-color="blue" data-url="https://journey.harver-us.com/vacancy/6a060301154605ed880b0d35">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Spanish</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="PHP AnatomyPhysio" data-color="purple" data-url="https://journey.harver-us.com/vacancy/67e73e7af2d06a81c622b807">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">PHP AnatomyPhysio</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Registered Nurse Test (Philippines)" data-color="blue" data-url="https://journey.harver-us.com/vacancy/67e85ab1f2d06a81c622b834">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Registered Nurse Test (Philippines)</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reports" class="card reports-section">
+    <h2>Reports</h2>
+    <p class="packages-subtitle">Assessment count by location</p>
+    <div class="reports-content">
+      <table class="reports-table">
+        <thead>
+          <tr><th>Location</th><th>Count</th></tr>
+        </thead>
+        <tbody id="reportTableBody">
+          <tr><td>Quezon City</td><td id="reportCount-quezon-city">0</td></tr>
+          <tr><td>Iloilo City</td><td id="reportCount-iloilo-city">0</td></tr>
+          <tr><td>Alabang</td><td id="reportCount-alabang">0</td></tr>
+          <tr><td>Bohol</td><td id="reportCount-bohol">0</td></tr>
+        </tbody>
+      </table>
+      <div id="reportChart" class="report-chart" aria-label="Assessment count by location"></div>
+    </div>
+    <div class="export-controls">
+      <label for="exportDateInput">Export date</label>
+      <input id="exportDateInput" type="date">
+      <button id="exportDataBtn" class="export-data-btn" type="button">Export Data</button>
+      <p id="exportStatus" class="export-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    // Paste your deployed Google Apps Script Web app URL here.
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZLchGVsACv4qfLD42gT-GG1ygAIJerD6iT9ayuY1nkCML_t6MRzDj96hw1VCuv1cIvw/exec';
+    const firebaseConfig = {
+      apiKey: 'AIzaSyBZVAXmgE-24AVUFB_7xS4GQi4OwkIvptQ',
+      authDomain: 'sagility-assessment.firebaseapp.com',
+      projectId: 'sagility-assessment',
+      storageBucket: 'sagility-assessment.firebasestorage.app',
+      messagingSenderId: '879192858532',
+      appId: '1:879192858532:web:39e190eb2b130998df6b31',
+      measurementId: 'G-QHND2XY4ZR'
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const firestore = firebase.firestore();
+    const firebaseAuthReady = firebase.auth().signInAnonymously();
+    let sentHistoryRecords = [];
+
+    function getManilaDateKey(date = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(date).reduce((values, part) => {
+        values[part.type] = part.value;
+        return values;
+      }, {});
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function getRecordDateKey(item) {
+      if (typeof item.dateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.dateKey)) {
+        return item.dateKey;
+      }
+      if (typeof item.timestamp === 'number') return getManilaDateKey(new Date(item.timestamp));
+      if (item.timestamp && typeof item.timestamp.toDate === 'function') {
+        return getManilaDateKey(item.timestamp.toDate());
+      }
+      if (item.date) {
+        const parsedDate = new Date(item.date);
+        if (!Number.isNaN(parsedDate.getTime())) return getManilaDateKey(parsedDate);
+      }
+      return '';
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[character]));
+    }
+
+    function normalizeLocation(location) {
+      const cleanLocation = String(location || '').trim();
+      const normalized = cleanLocation.toLowerCase();
+      const locationNames = {
+        'quezon city': 'Quezon City',
+        'qc': 'Quezon City',
+        'iloilo': 'Iloilo City',
+        'iloilo city': 'Iloilo City',
+        'alabang': 'Alabang',
+        'bohol': 'Bohol'
+      };
+      return locationNames[normalized] || cleanLocation;
+    }
+
+    /* ================================================================
+       EDIT PACKAGE NAMES AND LINKS HERE
+       Update only the name or url values below. The cards and email
+       links will use these values automatically.
+    ================================================================= */
+    const packageCatalog = {
+      level1: [
+        { name: 'Level 1 Workday (Personality, SJT, Logical, Computer)', url: 'https://journey.harver-us.com/vacancy/680a85c5678d2a49a06c94d3' },
+        { name: 'Level 1 Standalone (Personality, SJT, Logical)', url: 'https://journey.harver-us.com/vacancy/67dc5093f62d0c4018a3e8e9' }
+      ],
+      level2: [
+        { name: 'Level 2 (Spoken B2, English B1)', url: 'https://journey.harver-us.com/vacancy/680f51a8527167ce829a04dc' },
+        { name: 'Level 2 (Spoken B1, English B1)', url: 'https://journey.harver-us.com/vacancy/680fa6ba527167ce829a0660' },
+        { name: 'Level 2 (Spoken B2, English B1, Typing)', url: 'https://journey.harver-us.com/vacancy/680f58fe527167ce829a04f3' },
+        { name: 'Level 2 (Spoken B2, English B2, Typing)', url: 'https://journey.harver-us.com/vacancy/680f7607527167ce829a05bf' },
+        { name: 'Level 2 (Spoken B2, English, Typing, RNT)', url: 'https://journey.harver-us.com/vacancy/680f74a0527167ce829a057a' },
+        { name: 'Level 2 (English, Typing, RNT)', url: 'https://journey.harver-us.com/vacancy/680f7781527167ce829a0628' }
+      ],
+      standalone: [
+        { name: 'Spoken Language Proficiency - B1/B2', url: 'https://journey.harver-us.com/vacancy/67e314c6fdb051af4a247646' },
+        { name: 'Spoken Language Proficiency - B2/C1', url: 'https://journey.harver-us.com/vacancy/67e6f0f3f2d06a81c622b793' },
+        { name: 'English Language Proficiency', url: 'https://journey.harver-us.com/vacancy/67e85fd6f2d06a81c622b861' },
+        { name: 'PH - Standalone Typing Assessment', url: 'https://journey.harver-us.com/vacancy/67e86c60f2d06a81c622b88e' },
+        { name: 'Standalone Computer Proficiency Test', url: 'https://journey.harver-us.com/vacancy/67e9eb45f2d06a81c622b8a3' },
+        { name: 'Spanish', url: 'https://journey.harver-us.com/vacancy/6a060301154605ed880b0d35' },
+        { name: 'PHP AnatomyPhysio', url: 'https://journey.harver-us.com/vacancy/67e73e7af2d06a81c622b807' },
+        { name: 'Registered Nurse Test (Philippines)', url: 'https://journey.harver-us.com/vacancy/67e85ab1f2d06a81c622b834' }
+      ]
+    };
+
+    function applyPackageCatalog() {
+      Object.entries(packageCatalog).forEach(([category, packages]) => {
+        const list = document.getElementById(`packagesList-${category}`);
+        list.querySelectorAll('.package-checkbox').forEach((checkbox, index) => {
+          const packageDetails = packages[index];
+          if (!packageDetails) return;
+          checkbox.dataset.package = packageDetails.name;
+          checkbox.dataset.url = packageDetails.url;
+          const packageName = checkbox.closest('.package-item').querySelector('.package-name');
+          packageName.textContent = packageDetails.name;
+        });
+      });
+    }
+
+    applyPackageCatalog();
+
+    // Initialize selected packages on page load
+    function initializeSelectedPackages() {
+      updateSelectedPackages();
+    }
+
+    // Update selected packages display
+    function updateSelectedPackages() {
+      const checkboxes = document.querySelectorAll('.package-checkbox:checked');
+      const container = document.getElementById('selectedPackagesContainer');
+      container.innerHTML = '';
+
+      checkboxes.forEach(checkbox => {
+        const packageName = checkbox.dataset.package;
+        const listId = checkbox.closest('.packages-list').id;
+        const colorByCategory = {
+          'packagesList-level1': 'blue',
+          'packagesList-level2': 'green',
+          'packagesList-standalone': 'purple'
+        };
+        const color = colorByCategory[listId] || 'blue';
+        const url = checkbox.dataset.url;
+        const pkg = document.createElement('div');
+        pkg.className = `pkg ${color}`;
+        pkg.innerHTML = `
+          <div class="pkg-name">
+            <a href="${url}" target="_blank" rel="noopener noreferrer" class="pkg-link">${packageName}</a>
+          </div>
+          <button class="pkg-remove" data-package="${packageName}" type="button">✕</button>
+        `;
+        container.appendChild(pkg);
+
+        // Add remove button functionality
+        pkg.querySelector('.pkg-remove').addEventListener('click', (e) => {
+          e.preventDefault();
+          checkbox.checked = false;
+          updateSelectedPackages();
+          updatePackageItemUI(checkbox);
+        });
+      });
+
+      // Show empty state if no packages selected
+      if (checkboxes.length === 0) {
+        container.innerHTML = '<p class="no-packages">No packages selected</p>';
+      }
+    }
+
+    function renderSentHistory(searchTerm = '') {
+      const search = searchTerm.trim().toLowerCase();
+      const currentDateKey = getManilaDateKey();
+      const historyList = document.getElementById('sentHistoryList');
+      historyList.innerHTML = '';
+      const filteredHistory = sentHistoryRecords.filter(item =>
+        getRecordDateKey(item) === currentDateKey &&
+        (!search || `${item.name} ${item.email} ${item.location}`.toLowerCase().includes(search))
+      );
+
+      if (filteredHistory.length === 0) {
+        historyList.innerHTML = `<li class="sent-history-empty">${search ? 'No matching assessments' : 'No sent assessments yet'}</li>`;
+        return;
+      }
+
+      filteredHistory.forEach(item => {
+        const entry = document.createElement('li');
+        entry.textContent = `${item.date} - ${item.name} - ${item.email} - ${item.location}`;
+        historyList.appendChild(entry);
+      });
+    }
+
+    function renderReports() {
+      const currentDateKey = getManilaDateKey();
+      const counts = {
+        'Quezon City': 0,
+        'Iloilo City': 0,
+        'Alabang': 0,
+        'Bohol': 0
+      };
+      sentHistoryRecords
+        .filter(item => getRecordDateKey(item) === currentDateKey)
+        .forEach(item => {
+          const location = normalizeLocation(item.location);
+          if (counts[location] !== undefined) counts[location] += 1;
+        });
+
+      const locations = Object.keys(counts);
+      const maxCount = Math.max(...locations.map(location => counts[location]), 1);
+      locations.forEach(location => {
+        const countCellId = `reportCount-${location.toLowerCase().replaceAll(' ', '-')}`;
+        const countCell = document.getElementById(countCellId);
+        if (countCell) countCell.textContent = counts[location];
+      });
+      const chart = document.getElementById('reportChart');
+      if (!chart) return;
+      chart.innerHTML = locations.length
+        ? locations.map((location, index) => `
+          <div class="report-bar-row">
+            <span class="report-bar-label">${escapeHtml(location)}</span>
+            <div class="report-bar-track"><div class="report-bar bar-${index % 6}" style="width: ${(counts[location] / maxCount) * 100}%"></div></div>
+            <strong>${counts[location]}</strong>
+          </div>`).join('')
+        : '<p class="report-empty">No assessments today</p>';
+    }
+
+    function dateKeyToUtc(dateKey) {
+      const [year, month, day] = dateKey.split('-').map(Number);
+      return Date.UTC(year, month - 1, day);
+    }
+
+    function csvValue(value) {
+      return `"${String(value ?? '').replace(/"/g, '""')}"`;
+    }
+
+    function exportHistoryCsv() {
+      const selectedDate = document.getElementById('exportDateInput').value;
+      const exportStatus = document.getElementById('exportStatus');
+      if (!selectedDate) {
+        exportStatus.textContent = 'Choose a date first.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+
+      const todayUtc = dateKeyToUtc(getManilaDateKey());
+      const selectedUtc = dateKeyToUtc(selectedDate);
+      const ageInDays = Math.floor((todayUtc - selectedUtc) / 86400000);
+      if (ageInDays < 0 || ageInDays > 6) {
+        exportStatus.textContent = 'Only the last 7 days can be exported.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+
+      const records = sentHistoryRecords.filter(item => getRecordDateKey(item) === selectedDate);
+      if (records.length === 0) {
+        exportStatus.textContent = 'No records found for that date.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+
+      const rows = [
+        ['Name', 'Email', 'Date and Time', 'Location'],
+        ...records.map(item => [item.name, item.email, item.date, normalizeLocation(item.location)])
+      ];
+      const csv = rows.map(row => row.map(csvValue).join(',')).join('\r\n');
+      const downloadUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `sagility-assessments-${selectedDate}.csv`;
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+      exportStatus.textContent = `${records.length} record(s) exported.`;
+      exportStatus.className = 'export-status success';
+    }
+
+    async function addSentHistory(candidateName, recipient, location) {
+      await firebaseAuthReady;
+      await firestore.collection('sentHistory').add({
+        date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
+        dateKey: getManilaDateKey(),
+        timestamp: Date.now(),
+        name: candidateName,
+        email: recipient,
+        location: normalizeLocation(location)
+      });
+    }
+
+    function initializeFirebaseHistory() {
+      firebaseAuthReady
+        .then(() => {
+          firestore.collection('sentHistory')
+            .orderBy('timestamp', 'desc')
+            .onSnapshot(snapshot => {
+              sentHistoryRecords = snapshot.docs.map(document => document.data());
+              renderSentHistory(document.getElementById('historySearchInput').value);
+              renderReports();
+            }, error => {
+              document.getElementById('sentHistoryList').innerHTML = '<li class="sent-history-empty">History unavailable: check Firestore rules</li>';
+              console.error('Firestore history read failed:', error);
+            });
+        })
+        .catch(error => {
+          document.getElementById('sentHistoryList').innerHTML = '<li class="sent-history-empty">History unavailable: add this site to Firebase Authorized domains</li>';
+          document.getElementById('emailStatus').textContent = 'Firebase history unavailable.';
+          document.getElementById('emailStatus').className = 'email-status error';
+          console.error('Firebase authentication failed:', error);
+        });
+    }
+
+    document.getElementById('historySearchInput').addEventListener('input', event => {
+      renderSentHistory(event.target.value);
+    });
+
+    document.getElementById('exportDataBtn').addEventListener('click', exportHistoryCsv);
+
+    setInterval(() => {
+      renderSentHistory(document.getElementById('historySearchInput').value);
+    }, 60000);
+
+    // Update individual package item UI
+    function updatePackageItemUI(checkbox) {
+      const label = checkbox.closest('.package-item');
+      if (checkbox.checked) {
+        label.classList.add('checked');
+      } else {
+        label.classList.remove('checked');
+      }
+    }
+
+    // Add event listeners to all checkboxes
+    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        updatePackageItemUI(this);
+        updateSelectedPackages();
+      });
+    });
+
+    document.getElementById('sendEmailBtn').addEventListener('click', async () => {
+      const sendButton = document.getElementById('sendEmailBtn');
+      const emailStatus = document.getElementById('emailStatus');
+      const candidateName = document.getElementById('candidateNameInput').value.trim();
+      const recipient = document.getElementById('emailInput').value.trim();
+      const location = document.getElementById('locationInput').value.trim();
+      const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')];
+      const packages = selectedPackages.map(checkbox => ({
+        name: checkbox.dataset.package,
+        url: checkbox.dataset.url
+      }));
+
+      if (!candidateName || !recipient || !location || packages.length === 0) {
+        emailStatus.textContent = '';
+        emailStatus.className = 'email-status';
+        alert('Please enter the candidate name, email, location, and select at least one package.');
+        return;
+      }
+
+      const payload = { name: candidateName, email: recipient, location, packages };
+      sendButton.disabled = true;
+      emailStatus.textContent = 'Sending Assessment...........';
+      emailStatus.className = 'email-status sending';
+
+      if (GOOGLE_SCRIPT_URL) {
+        try {
+          await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          emailStatus.textContent = 'Successfully Sent.';
+          emailStatus.className = 'email-status success';
+
+          try {
+            await addSentHistory(candidateName, recipient, location);
+          } catch (historyError) {
+            emailStatus.textContent = 'Successfully Sent. History sync failed.';
+            emailStatus.className = 'email-status error';
+            console.error('Firestore history write failed:', historyError);
+          }
+        } catch (error) {
+          emailStatus.textContent = 'Unable to connect to the email service.';
+          emailStatus.className = 'email-status error';
+        } finally {
+          sendButton.disabled = false;
+        }
+        return;
+      }
+
+      const packageLinks = packages.map((item, index) =>
+        `Package ${index + 1} - ${item.name}: ${item.url}`
+      );
+      const subject = `Sagility Assessment_ ${candidateName}_${location}`;
+      const body = `Hi ${candidateName},\n\nGood Day!\n\nPlease click link/s below to start your assessment.\n\n${packageLinks.join('\n')}\n\nBefore You Start:\n\n• We recommend using a Laptop/PC and a headset.\n• Make sure you are in a quiet environment.\n• Use your active email address and enter the security code when prompted.\n• Read all instructions carefully before taking the assessment.\n\nNeed Assistance?\n\nIf you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.\n\nTime: 11am-8pm MNL\nLink: Meeting Invite\nMeeting ID: 479 656 747 406 7\nPasscode: vi3nV3NB\n\nImportant Reminders:\n\n⚠️ Use the assessment link only once.\n🔒 Do not share or forward the link.\n📍 The system records IP address and location.\n📇 Assessment materials are confidential. Any misuse may affect your application.\n\nFor questions or assistance, please contact:\nPHLTestAdmin@Sagilityhealth.com\n\nThank you, and good luck with your assessment!\n\nBest Regards,\n\nTalent Acquisition- Sagility Recruitment - Test Admin\n${location}`;
+      window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      await addSentHistory(candidateName, recipient, location);
+      emailStatus.textContent = 'Email draft opened.';
+      emailStatus.className = 'email-status success';
+      sendButton.disabled = false;
+    });
+
+    document.getElementById('clearDataBtn').addEventListener('click', () => {
+      document.getElementById('candidateNameInput').value = '';
+      document.getElementById('emailInput').value = '';
+      document.getElementById('locationInput').selectedIndex = 0;
+      document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+        updatePackageItemUI(checkbox);
+      });
+      document.getElementById('emailStatus').textContent = '';
+      document.getElementById('emailStatus').className = 'email-status';
+      updateSelectedPackages();
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeSelectedPackages();
+      renderReports();
+      initializeFirebaseHistory();
+    });
+  </script>
+</body>
+</html>
