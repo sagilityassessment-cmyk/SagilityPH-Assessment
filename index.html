@@ -445,7 +445,6 @@
       }));
 
       const state = {
-        sentHistory: sentHistoryRecords,
         selectedPackages
       };
 
@@ -458,10 +457,6 @@
 
     function restoreState() {
       const savedState = getPersistedState();
-      if (savedState.sentHistory.length) {
-        sentHistoryRecords = savedState.sentHistory;
-      }
-
       document.querySelectorAll('.package-checkbox').forEach(checkbox => {
         const saved = savedState.selectedPackages.find(item => item.package === checkbox.dataset.package);
         checkbox.checked = Boolean(saved);
@@ -797,26 +792,38 @@
     document.getElementById('exportDataBtn').addEventListener('click', exportHistoryCsv);
 
     document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', async () => {
+      const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
       const selectedCheckboxes = document.querySelectorAll('.history-select-checkbox:checked');
       if (!selectedCheckboxes.length) return;
 
       const confirmed = window.confirm('Delete selected history records?');
       if (!confirmed) return;
 
-      const ids = [...selectedCheckboxes].map(checkbox => checkbox.dataset.recordId).filter(Boolean);
-      for (const id of ids) {
-        try {
-          await firestore.collection('sentHistory').doc(id).update({
-            deleted: true,
-            deletedAt: Date.now()
-          });
-        } catch (error) {
-          console.error('Firestore batch delete failed:', error);
-        }
-      }
+      const ids = [...selectedCheckboxes]
+        .map(checkbox => checkbox.dataset.recordId)
+        .filter(Boolean);
+      if (!ids.length) return;
 
-      renderSentHistory(document.getElementById('historySearchInput').value);
-      renderReports();
+      deleteButton.disabled = true;
+      try {
+        await firebaseAuthReady;
+        const batch = firestore.batch();
+        ids.forEach(id => batch.update(firestore.collection('sentHistory').doc(id), {
+          deleted: true,
+          deletedAt: Date.now()
+        }));
+        await batch.commit();
+
+        const deletedIds = new Set(ids);
+        sentHistoryRecords = sentHistoryRecords.filter(record => !deletedIds.has(record.recordId));
+        persistState();
+        renderSentHistory(document.getElementById('historySearchInput').value);
+        renderReports();
+      } catch (error) {
+        console.error('Firestore batch delete failed:', error);
+        alert('Unable to delete the selected records from all browsers. Please check the Firestore permissions and try again.');
+        updateDeleteSelectedButtonState();
+      }
     });
 
     setInterval(() => {
