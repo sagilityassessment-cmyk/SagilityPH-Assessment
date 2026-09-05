@@ -1274,7 +1274,7 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):activ
   body {
     display: flex;
     flex-direction: column;
-    padding-top: 164px;
+    padding-top: 172px;
   }
 
   header.top {
@@ -1389,19 +1389,19 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):activ
   }
 
   .packages-category {
-    padding: 10px;
+    padding: 9px;
   }
 
   .category-title {
-    font-size: 13px;
-    margin-bottom: 8px;
+    font-size: 12px;
+    margin-bottom: 7px;
   }
 
   .package-item {
     grid-template-columns: 16px minmax(0, 1fr);
     gap: 6px;
-    min-height: 46px;
-    padding: 7px 8px;
+    min-height: 42px;
+    padding: 6px 8px;
   }
 
   .package-checkbox {
@@ -1410,7 +1410,7 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):activ
   }
 
   .package-name {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.35;
   }
 
