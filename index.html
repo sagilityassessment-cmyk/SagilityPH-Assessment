@@ -392,7 +392,81 @@
     firebase.initializeApp(firebaseConfig);
     const firestore = firebase.firestore();
     const firebaseAuthReady = firebase.auth().signInAnonymously();
+    const LOCAL_STORAGE_KEY = 'sagility-assessment-state';
+    const HISTORY_DELETE_KEY = 'sagility-assessment-hidden-history';
     let sentHistoryRecords = [];
+
+    function getPersistedState() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '{}');
+        return {
+          sentHistory: Array.isArray(stored.sentHistory) ? stored.sentHistory : [],
+          selectedPackages: Array.isArray(stored.selectedPackages) ? stored.selectedPackages : []
+        };
+      } catch (error) {
+        return { sentHistory: [], selectedPackages: [] };
+      }
+    }
+
+    function getHiddenHistoryKeys() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(HISTORY_DELETE_KEY) || '[]');
+        return Array.isArray(stored) ? stored : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function recordSignature(record) {
+      const parts = [
+        record.name || '',
+        record.email || '',
+        record.location || '',
+        record.dateKey || '',
+        record.timestamp || '',
+        record.date || ''
+      ];
+      return parts.join('|');
+    }
+
+    function isHiddenHistoryRecord(record) {
+      return getHiddenHistoryKeys().includes(recordSignature(record));
+    }
+
+    function persistState() {
+      const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')].map(checkbox => ({
+        package: checkbox.dataset.package,
+        url: checkbox.dataset.url
+      }));
+
+      const state = {
+        sentHistory: sentHistoryRecords,
+        selectedPackages
+      };
+
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function persistHiddenHistoryKeys(keys) {
+      localStorage.setItem(HISTORY_DELETE_KEY, JSON.stringify(keys));
+    }
+
+    function restoreState() {
+      const savedState = getPersistedState();
+      if (savedState.sentHistory.length) {
+        sentHistoryRecords = savedState.sentHistory;
+      }
+
+      document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+        const saved = savedState.selectedPackages.find(item => item.package === checkbox.dataset.package);
+        checkbox.checked = Boolean(saved);
+        updatePackageItemUI(checkbox);
+      });
+
+      updateSelectedPackages();
+      renderSentHistory(document.getElementById('historySearchInput')?.value || '');
+      renderReports();
+    }
 
     function getManilaDateKey(date = new Date()) {
       const parts = new Intl.DateTimeFormat('en-US', {
@@ -539,12 +613,16 @@
       }
     }
 
+    function getVisibleHistoryRecords() {
+      return sentHistoryRecords.filter(item => !isHiddenHistoryRecord(item));
+    }
+
     function renderSentHistory(searchTerm = '') {
       const search = searchTerm.trim().toLowerCase();
       const currentDateKey = getManilaDateKey();
       const historyList = document.getElementById('sentHistoryList');
       historyList.innerHTML = '';
-      const filteredHistory = sentHistoryRecords.filter(item =>
+      const filteredHistory = getVisibleHistoryRecords().filter(item =>
         getRecordDateKey(item) === currentDateKey &&
         (!search || `${item.name} ${item.email} ${item.location}`.toLowerCase().includes(search))
       );
@@ -556,7 +634,29 @@
 
       filteredHistory.forEach(item => {
         const entry = document.createElement('li');
-        entry.textContent = `${item.date} - ${item.name} - ${item.email} - ${item.location}`;
+        entry.className = 'history-item';
+        entry.innerHTML = `
+          <span class="history-item-text">${item.date} - ${item.name} - ${item.email} - ${item.location}</span>
+          <button class="history-delete-btn" type="button" aria-label="Delete ${escapeHtml(item.name)}">✕</button>
+        `;
+
+        const deleteButton = entry.querySelector('.history-delete-btn');
+        deleteButton.addEventListener('click', () => {
+          const confirmed = window.confirm('Are you sure you want to delete this record?');
+          if (!confirmed) return;
+
+          const signature = recordSignature(item);
+          const hiddenKeys = getHiddenHistoryKeys();
+          if (!hiddenKeys.includes(signature)) {
+            hiddenKeys.push(signature);
+            persistHiddenHistoryKeys(hiddenKeys);
+          }
+          sentHistoryRecords = sentHistoryRecords.filter(record => recordSignature(record) !== signature);
+          persistState();
+          renderSentHistory(document.getElementById('historySearchInput').value);
+          renderReports();
+        });
+
         historyList.appendChild(entry);
       });
     }
@@ -569,7 +669,7 @@
         'Alabang': 0,
         'Bohol': 0
       };
-      sentHistoryRecords
+      getVisibleHistoryRecords()
         .filter(item => getRecordDateKey(item) === currentDateKey)
         .forEach(item => {
           const location = normalizeLocation(item.location);
@@ -622,7 +722,7 @@
         return;
       }
 
-      const records = sentHistoryRecords.filter(item => getRecordDateKey(item) === selectedDate);
+      const records = getVisibleHistoryRecords().filter(item => getRecordDateKey(item) === selectedDate);
       if (records.length === 0) {
         exportStatus.textContent = 'No records found for that date.';
         exportStatus.className = 'export-status error';
@@ -703,6 +803,7 @@
       checkbox.addEventListener('change', function() {
         updatePackageItemUI(this);
         updateSelectedPackages();
+        persistState();
       });
     });
 
@@ -770,6 +871,14 @@
     });
 
     document.getElementById('clearDataBtn').addEventListener('click', () => {
+      const passwordInput = window.prompt('Enter password to clear data:');
+      if (passwordInput !== 'Sagility_1') {
+        if (passwordInput !== null) {
+          alert('Incorrect password.');
+        }
+        return;
+      }
+
       document.getElementById('candidateNameInput').value = '';
       document.getElementById('emailInput').value = '';
       document.getElementById('locationInput').selectedIndex = 0;
@@ -777,14 +886,20 @@
         checkbox.checked = false;
         updatePackageItemUI(checkbox);
       });
+      sentHistoryRecords = [];
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      persistHiddenHistoryKeys([]);
       document.getElementById('emailStatus').textContent = '';
       document.getElementById('emailStatus').className = 'email-status';
       updateSelectedPackages();
+      renderSentHistory(document.getElementById('historySearchInput').value);
+      renderReports();
+      alert('Data cleared successfully.');
     });
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
-      initializeSelectedPackages();
+      restoreState();
       renderReports();
       initializeFirebaseHistory();
     });

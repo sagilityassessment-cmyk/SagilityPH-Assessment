@@ -592,17 +592,78 @@ section.card h2 {
   max-height: 300px;
   overflow-y: auto;
   margin: 0;
-  padding: 0 0 0 24px;
-  color: var(--primary-blue);
+  padding: 0;
+  list-style: none;
+  color: #1c2a3a;
   font-size: 12px;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.sent-history-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sent-history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sent-history-list::-webkit-scrollbar-thumb {
+  background: #d5d9e8;
+  border-radius: 999px;
 }
 
 .sent-history-list li {
-  padding: 8px 10px;
-  border: 1px solid var(--border-light);
+  padding: 0;
+  border: 1px solid #e5e8f0;
   border-radius: 8px;
-  background: #eef6ff;
+  background: #ffffff !important;
+  background-image: none !important;
   overflow-wrap: anywhere;
+}
+
+.history-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  min-height: 26px;
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+.history-item-text {
+  min-width: 0;
+  word-break: break-word;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #1d2c3f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: transparent !important;
+}
+
+.history-delete-btn {
+  border: none;
+  background: #d93048;
+  background-image: none !important;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 900;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  border-radius: 4px;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 0;
+  box-shadow: none !important;
 }
 
 .sent-history-empty {
@@ -1023,7 +1084,7 @@ button {
   font-family: inherit;
 }
 
-button:not(.send-email-btn):not(.pkg-remove) {
+button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn) {
   width: 100%;
   padding: 16px 20px;
   border: none;
