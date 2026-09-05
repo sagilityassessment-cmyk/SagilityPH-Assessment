@@ -61,7 +61,7 @@ body {
   line-height: 1.6;
   position: relative;
   overflow-x: hidden;
-  padding-top: 132px;
+  padding-top: 157px;
 }
 
 body::before {
@@ -127,7 +127,7 @@ header.top {
   z-index: 1000;
   width: 100%;
   isolation: isolate;
-  min-height: 132px;
+  min-height: 157px;
   overflow: visible;
 }
 
@@ -144,8 +144,8 @@ header.top {
 }
 
 .logo-img {
-  width: 130px;
-  height: 130px;
+  width: 195px;
+  height: auto;
   flex-shrink: 0;
   object-fit: contain;
 }
@@ -386,6 +386,18 @@ main.grid {
   margin: 0;
   color: var(--text-secondary);
   text-align: center;
+}
+
+.reports-total {
+  margin-top: 18px;
+  color: var(--primary-blue);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reports-total strong {
+  color: var(--accent-blue);
+  font-size: 16px;
 }
 
 .export-controls {
@@ -1262,20 +1274,20 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):activ
   body {
     display: flex;
     flex-direction: column;
-    padding-top: 220px;
+    padding-top: 164px;
   }
 
   header.top {
     flex-wrap: wrap;
     justify-content: center;
-    padding: 6px 12px 8px;
-    gap: 2px;
+    padding: 3px 12px 5px;
+    gap: 0;
     min-height: 0;
   }
   
   .logo-img {
-    width: 62px;
-    height: 62px;
+    width: 156px;
+    height: auto;
     display: block;
     margin: 0;
   }

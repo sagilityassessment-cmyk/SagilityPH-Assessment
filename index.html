@@ -366,6 +366,7 @@
       </table>
       <div id="reportChart" class="report-chart" aria-label="Assessment count by location"></div>
     </div>
+    <div class="reports-total">Total unique emails today: <strong id="reportTotalCount">0</strong></div>
     <div class="export-controls">
       <label for="exportDateInput">Export date</label>
       <input id="exportDateInput" type="date">
@@ -542,9 +543,9 @@
         { name: 'Spoken Language Proficiency - B1/B2', url: 'https://journey.harver-us.com/vacancy/67e314c6fdb051af4a247646' },
         { name: 'Spoken Language Proficiency - B2/C1', url: 'https://journey.harver-us.com/vacancy/67e6f0f3f2d06a81c622b793' },
         { name: 'English Language Proficiency', url: 'https://journey.harver-us.com/vacancy/67e85fd6f2d06a81c622b861' },
-        { name: 'PH - Standalone Typing Assessment', url: 'https://journey.harver-us.com/vacancy/67e86c60f2d06a81c622b88e' },
-        { name: 'Standalone Computer Proficiency Test', url: 'https://journey.harver-us.com/vacancy/67e9eb45f2d06a81c622b8a3' },
-        { name: 'Spanish', url: 'https://journey.harver-us.com/vacancy/6a060301154605ed880b0d35' },
+        { name: 'Typing Assessment', url: 'https://journey.harver-us.com/vacancy/67e86c60f2d06a81c622b88e' },
+        { name: 'Basic Computer Proficiency Test', url: 'https://journey.harver-us.com/vacancy/67e9eb45f2d06a81c622b8a3' },
+        { name: 'Spanish Bilingual', url: 'https://journey.harver-us.com/vacancy/6a060301154605ed880b0d35' },
         { name: 'PHP AnatomyPhysio', url: 'https://journey.harver-us.com/vacancy/67e73e7af2d06a81c622b807' },
         { name: 'Registered Nurse Test (Philippines)', url: 'https://journey.harver-us.com/vacancy/67e85ab1f2d06a81c622b834' }
       ]
@@ -667,20 +668,27 @@
         'Alabang': 0,
         'Bohol': 0
       };
+      const countedEmails = new Set();
       getVisibleHistoryRecords()
         .filter(item => getRecordDateKey(item) === currentDateKey)
         .forEach(item => {
+          const email = String(item.email || '').trim().toLowerCase();
+          if (!email || countedEmails.has(email)) return;
+          countedEmails.add(email);
           const location = normalizeLocation(item.location);
           if (counts[location] !== undefined) counts[location] += 1;
         });
 
       const locations = Object.keys(counts);
+      const totalCount = countedEmails.size;
       const maxCount = Math.max(...locations.map(location => counts[location]), 1);
       locations.forEach(location => {
         const countCellId = `reportCount-${location.toLowerCase().replaceAll(' ', '-')}`;
         const countCell = document.getElementById(countCellId);
         if (countCell) countCell.textContent = counts[location];
       });
+      const totalCountElement = document.getElementById('reportTotalCount');
+      if (totalCountElement) totalCountElement.textContent = totalCount;
       const chart = document.getElementById('reportChart');
       if (!chart) return;
       chart.innerHTML = locations.length

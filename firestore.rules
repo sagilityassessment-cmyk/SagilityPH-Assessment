@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /sentHistory/{recordId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+
+      allow update: if request.auth != null && (
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted', 'deletedAt']) &&
+          request.resource.data.deleted == true &&
+          request.resource.data.deletedAt is int
+        ) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recordId']) &&
+          resource.data.recordId == '' &&
+          request.resource.data.recordId == recordId
+        )
+      );
+
+      allow delete: if false;
+    }
+  }
+}
