@@ -656,11 +656,11 @@ section.card h2 {
   min-width: 0;
 }
 
-.pkg-name::before {
-  content: '✓';
+.pkg-check {
   font-weight: 700;
   font-size: 16px;
   flex-shrink: 0;
+  line-height: 1;
 }
 
 .pkg-link {
@@ -1188,32 +1188,52 @@ button:not(.send-email-btn):not(.pkg-remove):active {
 
 @media (max-width: 768px) {
   body {
-    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 220px;
   }
 
   header.top {
     flex-wrap: wrap;
-    padding: 10px 16px;
-    gap: 10px;
+    justify-content: center;
+    padding: 6px 12px 8px;
+    gap: 2px;
     min-height: 0;
   }
   
   .logo-img {
-    width: 48px;
-    height: 48px;
+    width: 62px;
+    height: 62px;
+    display: block;
+    margin: 0;
+  }
+
+  .logo {
+    width: auto;
+    justify-content: center;
+    margin: 0 auto;
+    line-height: 0;
+    padding: 0;
   }
   
   .header-text-box {
-    flex: 1 1 calc(100% - 45px);
+    flex: 1 1 100%;
     padding: 8px 12px;
+    margin-top: 0;
   }
   
   .header-text-box h1 {
-    font-size: 12px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
   }
   
   .header-text-box p {
     font-size: 9px;
+    line-height: 1.3;
+  }
+
+  .header-credit {
+    font-size: 9px !important;
   }
   
   nav {
@@ -1251,6 +1271,95 @@ button:not(.send-email-btn):not(.pkg-remove):active {
   
   section.card h2 {
     font-size: 16px;
+  }
+
+  main.grid {
+    display: contents;
+  }
+
+  main.grid > section:first-child {
+    order: 1;
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+  }
+
+  .right-column {
+    display: contents;
+  }
+
+  .selected-packages-card {
+    order: 3;
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+  }
+
+  .sent-history-card {
+    order: 5;
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+  }
+
+  .assessment-packages-full {
+    order: 2;
+    width: calc(100% - 32px);
+  }
+
+  .packages-category {
+    padding: 10px;
+  }
+
+  .category-title {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .package-item {
+    grid-template-columns: 16px minmax(0, 1fr);
+    gap: 6px;
+    min-height: 46px;
+    padding: 7px 8px;
+  }
+
+  .package-checkbox {
+    width: 14px;
+    height: 14px;
+  }
+
+  .package-name {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .selected-packages-card #selectedPackagesContainer {
+    gap: 8px;
+  }
+
+  .pkg {
+    padding: 9px 10px;
+    font-size: 12px;
+    min-height: 40px;
+    border-radius: 8px;
+    gap: 8px;
+  }
+
+  .pkg-check {
+    font-size: 12px;
+  }
+
+  .pkg-remove {
+    font-size: 14px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .send-email-btn {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .reports-section {
+    order: 4;
+    width: calc(100% - 32px);
   }
   
   .categories-wrapper {

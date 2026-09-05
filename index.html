@@ -517,6 +517,7 @@
         pkg.className = `pkg ${color}`;
         pkg.innerHTML = `
           <div class="pkg-name">
+            <span class="pkg-check" aria-hidden="true">✓</span>
             <a href="${url}" target="_blank" rel="noopener noreferrer" class="pkg-link">${packageName}</a>
           </div>
           <button class="pkg-remove" data-package="${packageName}" type="button">✕</button>
