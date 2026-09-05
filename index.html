@@ -124,6 +124,7 @@
         </div>
         <input id="historySearchInput" class="history-search-input" type="search" placeholder="Search name, email, or location">
         <ol id="sentHistoryList" class="sent-history-list"></ol>
+        <button id="deleteSelectedHistoryBtn" class="history-delete-selected" type="button" disabled>Delete</button>
       </section>
     </div>
   </main>
@@ -433,6 +434,10 @@
       return getHiddenHistoryKeys().includes(recordSignature(record));
     }
 
+    function isDeletedHistoryRecord(record) {
+      return Boolean(record.deleted === true || record.isDeleted === true);
+    }
+
     function persistState() {
       const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')].map(checkbox => ({
         package: checkbox.dataset.package,
@@ -614,7 +619,14 @@
     }
 
     function getVisibleHistoryRecords() {
-      return sentHistoryRecords.filter(item => !isHiddenHistoryRecord(item));
+      return sentHistoryRecords.filter(item => !isHiddenHistoryRecord(item) && !isDeletedHistoryRecord(item));
+    }
+
+    function updateDeleteSelectedButtonState() {
+      const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
+      const count = document.querySelectorAll('.history-select-checkbox:checked').length;
+      deleteButton.disabled = count === 0;
+      deleteButton.textContent = count > 0 ? `Delete (${count})` : 'Delete';
     }
 
     function renderSentHistory(searchTerm = '') {
@@ -629,6 +641,7 @@
 
       if (filteredHistory.length === 0) {
         historyList.innerHTML = `<li class="sent-history-empty">${search ? 'No matching assessments' : 'No sent assessments yet'}</li>`;
+        updateDeleteSelectedButtonState();
         return;
       }
 
@@ -636,29 +649,19 @@
         const entry = document.createElement('li');
         entry.className = 'history-item';
         entry.innerHTML = `
-          <span class="history-item-text">${item.date} - ${item.name} - ${item.email} - ${item.location}</span>
-          <button class="history-delete-btn" type="button" aria-label="Delete ${escapeHtml(item.name)}">✕</button>
+          <label class="history-select-row">
+            <input type="checkbox" class="history-select-checkbox" data-record-id="${item.recordId || ''}">
+            <span class="history-item-text">${item.date} - ${item.name} - ${item.email} - ${item.location}</span>
+          </label>
         `;
 
-        const deleteButton = entry.querySelector('.history-delete-btn');
-        deleteButton.addEventListener('click', () => {
-          const confirmed = window.confirm('Are you sure you want to delete this record?');
-          if (!confirmed) return;
-
-          const signature = recordSignature(item);
-          const hiddenKeys = getHiddenHistoryKeys();
-          if (!hiddenKeys.includes(signature)) {
-            hiddenKeys.push(signature);
-            persistHiddenHistoryKeys(hiddenKeys);
-          }
-          sentHistoryRecords = sentHistoryRecords.filter(record => recordSignature(record) !== signature);
-          persistState();
-          renderSentHistory(document.getElementById('historySearchInput').value);
-          renderReports();
-        });
+        const checkbox = entry.querySelector('.history-select-checkbox');
+        checkbox.addEventListener('change', updateDeleteSelectedButtonState);
 
         historyList.appendChild(entry);
       });
+
+      updateDeleteSelectedButtonState();
     }
 
     function renderReports() {
@@ -746,14 +749,20 @@
 
     async function addSentHistory(candidateName, recipient, location) {
       await firebaseAuthReady;
-      await firestore.collection('sentHistory').add({
+      const docRef = await firestore.collection('sentHistory').add({
         date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
         dateKey: getManilaDateKey(),
         timestamp: Date.now(),
         name: candidateName,
         email: recipient,
-        location: normalizeLocation(location)
+        location: normalizeLocation(location),
+        deleted: false,
+        deletedAt: null,
+        recordId: ''
       });
+
+      await firestore.collection('sentHistory').doc(docRef.id).update({ recordId: docRef.id });
+      return docRef.id;
     }
 
     function initializeFirebaseHistory() {
@@ -762,7 +771,10 @@
           firestore.collection('sentHistory')
             .orderBy('timestamp', 'desc')
             .onSnapshot(snapshot => {
-              sentHistoryRecords = snapshot.docs.map(document => document.data());
+              sentHistoryRecords = snapshot.docs.map(document => ({
+                ...document.data(),
+                recordId: document.id
+              }));
               renderSentHistory(document.getElementById('historySearchInput').value);
               renderReports();
             }, error => {
@@ -783,6 +795,29 @@
     });
 
     document.getElementById('exportDataBtn').addEventListener('click', exportHistoryCsv);
+
+    document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', async () => {
+      const selectedCheckboxes = document.querySelectorAll('.history-select-checkbox:checked');
+      if (!selectedCheckboxes.length) return;
+
+      const confirmed = window.confirm('Delete selected history records?');
+      if (!confirmed) return;
+
+      const ids = [...selectedCheckboxes].map(checkbox => checkbox.dataset.recordId).filter(Boolean);
+      for (const id of ids) {
+        try {
+          await firestore.collection('sentHistory').doc(id).update({
+            deleted: true,
+            deletedAt: Date.now()
+          });
+        } catch (error) {
+          console.error('Firestore batch delete failed:', error);
+        }
+      }
+
+      renderSentHistory(document.getElementById('historySearchInput').value);
+      renderReports();
+    });
 
     setInterval(() => {
       renderSentHistory(document.getElementById('historySearchInput').value);
