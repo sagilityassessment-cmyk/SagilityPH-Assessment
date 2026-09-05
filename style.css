@@ -930,34 +930,31 @@ section.card h2 {
   background: var(--bg-hover);
 }
 
-.package-item:nth-child(6n + 1).checked {
-  background: var(--blue-light);
+#packagesList-level1 .package-item.checked {
+  background: #eaf4ff;
   border-color: #9bc1ff;
 }
 
-.package-item:nth-child(6n + 2).checked {
-  background: var(--green-light);
+#packagesList-level2 .package-item.checked {
+  background: #ebfff1;
   border-color: #8bd8a5;
 }
 
-.package-item:nth-child(6n + 3).checked {
-  background: var(--purple-light);
-  border-color: #c6a3ff;
+#packagesList-standalone .package-item.checked {
+  background: #f5ecff;
+  border-color: #c8aaf8;
 }
 
-.package-item:nth-child(6n + 4).checked {
-  background: var(--pink-light);
-  border-color: #f0a6b8;
+#packagesList-level1 .package-checkbox {
+  accent-color: #4d7cff;
 }
 
-.package-item:nth-child(6n + 5).checked {
-  background: var(--yellow-light);
-  border-color: #e8ce73;
+#packagesList-level2 .package-checkbox {
+  accent-color: #4bb06b;
 }
 
-.package-item:nth-child(6n).checked {
-  background: var(--orange-light);
-  border-color: #efb37a;
+#packagesList-standalone .package-checkbox {
+  accent-color: #9c6ae8;
 }
 
 .package-checkbox {
