@@ -804,6 +804,14 @@
       const selectedCheckboxes = document.querySelectorAll('.history-select-checkbox:checked');
       if (!selectedCheckboxes.length) return;
 
+      const passwordInput = window.prompt('Enter password to delete history:');
+      if (passwordInput !== 'Sagility_1') {
+        if (passwordInput !== null) {
+          alert('Incorrect password.');
+        }
+        return;
+      }
+
       const confirmed = window.confirm('Delete selected history records?');
       if (!confirmed) return;
 
@@ -921,14 +929,6 @@
     });
 
     document.getElementById('clearDataBtn').addEventListener('click', () => {
-      const passwordInput = window.prompt('Enter password to clear data:');
-      if (passwordInput !== 'Sagility_1') {
-        if (passwordInput !== null) {
-          alert('Incorrect password.');
-        }
-        return;
-      }
-
       document.getElementById('candidateNameInput').value = '';
       document.getElementById('emailInput').value = '';
       document.getElementById('locationInput').selectedIndex = 0;
