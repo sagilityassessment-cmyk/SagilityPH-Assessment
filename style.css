@@ -1762,6 +1762,33 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     gap: 14px;
   }
 
+  .notification-details-search-controls {
+    order: 3;
+  }
+
+  .notification-details-scroll {
+    order: 4;
+  }
+
+  .notification-export-row {
+    order: 5;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notification-delete-controls {
+    order: 1;
+    justify-content: flex-end;
+  }
+
+  .notification-export-controls {
+    order: 2;
+  }
+
+  .notification-report-actions {
+    order: 6;
+  }
+
   .notification-chart-columns {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 2px;
