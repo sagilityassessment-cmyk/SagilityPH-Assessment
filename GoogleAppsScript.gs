@@ -12,6 +12,7 @@ const MEETING_TIME = '11am-8pm MNL';
 const MEETING_LINK = 'https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWUyMzUzYzYtNTgxYS00ZWVhLWJjN2UtNTA4YWM2Mzg1Zjdk%40thread.v2/0?context=%7b%22Tid%22%3a%22c0745124-84a4-4909-bb95-307ad5a8ae15%22%2c%22Oid%22%3a%22e7eb26f1-7544-4bac-bfac-c4674034791e%22%7d';
 const MEETING_ID = '479 656 747 406 7';
 const MEETING_PASSCODE = 'vi3nV3NB';
+const CANDIDATE_NOTIFICATION_URL = 'https://sagilityassessment-cmyk.github.io/SagilityPH-Assessment/candidate.html';
 
 function doPost(e) {
   try {
@@ -55,14 +56,21 @@ Please click link/s below to start your assessment.
 
 ${packageLines}
 
-BEFORE YOU START:
+Note:
+If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.
 
-• We recommend using a Laptop/PC and a headset.
-• Make sure you are in a quiet environment.
-• Use your active email address and enter the security code when prompted.
-• Read all instructions carefully before taking the assessment.
+Notification link: ${CANDIDATE_NOTIFICATION_URL}
 
-NEED ASSISTANCE?
+Once notified, our Test Administrator will review your assessment status and proceed with checking your results.
+
+Before You Start:
+
+We recommend using a laptop or desktop computer and a headset for the best experience. However, if a laptop or desktop computer is not available, you may use your mobile device to complete the assessment.
+Make sure you are in a quiet environment.
+Use your active email address and enter the security code when prompted.
+Read all instructions carefully before taking the assessment.
+
+Need Assistance?
 
 If you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.
 
@@ -71,9 +79,7 @@ Link: ${MEETING_LINK}
 Meeting ID: ${MEETING_ID}
 Passcode: ${MEETING_PASSCODE}
 
-***********************************************
-
-IMPORTANT REMINDERS:
+Important Reminders:
 
 ⚠️ Use the assessment link only once.
 🔒 Do not share or forward the link.
@@ -100,9 +106,13 @@ function buildHtmlBody(candidateName, location, packages) {
 <p>Good Day!</p>
 <p>Please click link/s below to start your assessment.</p>
 <ol>${packageLinks}</ol>
+<h3>Note:</h3>
+<p>If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.</p>
+<p><strong>Notify Test Administrator link:</strong> <a href="${escapeAttribute(CANDIDATE_NOTIFICATION_URL)}">${escapeHtml(CANDIDATE_NOTIFICATION_URL)}</a></p>
+<p>Once notified, our Test Administrator will review your assessment status and proceed with checking your results.</p>
 <h3>Before You Start:</h3>
 <ul>
-<li>We recommend using a Laptop/PC and a headset.</li>
+<li>We recommend using a laptop or desktop computer and a headset for the best experience. However, if a laptop or desktop computer is not available, you may use your mobile device to complete the assessment.</li>
 <li>Make sure you are in a quiet environment.</li>
 <li>Use your active email address and enter the security code when prompted.</li>
 <li>Read all instructions carefully before taking the assessment.</li>
@@ -110,7 +120,6 @@ function buildHtmlBody(candidateName, location, packages) {
 <h3>Need Assistance?</h3>
 <p>If you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.</p>
 <p>Time: ${MEETING_TIME}<br>Link: <a href="${escapeAttribute(MEETING_LINK)}">Meeting Invite</a><br>Meeting ID: ${MEETING_ID}<br>Passcode: ${MEETING_PASSCODE}</p>
-<hr>
 <h3>Important Reminders:</h3>
 <ul>
 <li>⚠️ Use the assessment link only once.</li>
