@@ -53,7 +53,13 @@
   <main class="grid">
     <!-- LEFT SIDE: CANDIDATE INFORMATION -->
     <section class="card">
-      <h2>Candidate Information</h2>
+      <div class="card-header">
+        <svg class="card-icon candidate-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <h2>Candidate Information</h2>
+      </div>
       <div class="form-group">
         <label class="form-label">
           <svg class="form-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -98,20 +104,24 @@
       <!-- SELECTED PACKAGES CARD -->
       <section class="card selected-packages-card">
         <div class="card-header">
-          <svg class="card-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="20" r="1"></circle>
+            <circle cx="19" cy="20" r="1"></circle>
+            <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 8H6"></path>
           </svg>
-          <h2>Selected Package(s) Review and Confirmation</h2>
+          <h2>Selected Package(s)</h2>
         </div>
         <div id="selectedPackagesContainer" class="selected-packages-scroll"></div>
-        <button id="sendEmailBtn" class="send-email-btn" type="button">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
-            <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          Send Email
-        </button>
-        <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
+        <div class="send-email-actions">
+          <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
+          <button id="sendEmailBtn" class="send-email-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
+              <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Send Email
+          </button>
+        </div>
       </section>
 
       <section class="card sent-history-card">

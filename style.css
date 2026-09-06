@@ -467,21 +467,46 @@ section.card h2 {
   font-weight: 600;
 }
 
+main.grid > section.card:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+main.grid > section.card:first-child .form-group:last-of-type {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+main.grid > section.card:first-child .clear-data-btn {
+  margin-top: 18px;
+}
+
 .card-header {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
+  min-height: 24px;
   margin-bottom: 20px;
 }
 
-.card-header h2 {
+section.card .card-header h2 {
   margin: 0;
+  line-height: 1.2;
 }
 
 .card-icon {
+  display: block;
   width: 24px;
   height: 24px;
   color: var(--green);
+  flex: 0 0 24px;
+}
+
+.candidate-card-icon {
+  color: var(--accent-blue);
 }
 
 /* ===== FORM STYLES ===== */
@@ -492,6 +517,7 @@ section.card h2 {
 .form-label {
   display: flex;
   align-items: center;
+  min-height: 20px;
   gap: 8px;
   font-size: 13px;
   font-weight: 600;
@@ -501,6 +527,7 @@ section.card h2 {
 }
 
 .form-icon {
+  display: block;
   width: 16px;
   height: 16px;
   stroke: currentColor;
@@ -559,7 +586,7 @@ section.card h2 {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0 4px 8px 4px;
-  max-height: 400px;
+  max-height: 240px;
 }
 
 .selected-packages-card #selectedPackagesContainer::-webkit-scrollbar {
@@ -578,6 +605,8 @@ section.card h2 {
 
 .sent-history-card {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
@@ -675,7 +704,7 @@ section.card h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 10px 0 0 auto;
+  margin: auto 0 0 auto;
   padding: 6px 12px;
   border: 1px solid #d93048;
   border-radius: 6px;
@@ -703,7 +732,8 @@ section.card h2 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow-y: auto;
+    height: auto;
+    min-height: 0;
   overflow-x: hidden;
   padding-right: 4px;
 }
@@ -714,7 +744,7 @@ section.card h2 {
   text-align: center;
   padding: 20px;
   background: var(--bg-hover);
-  border-radius: 10px;
+    max-height: none;
   margin: 0;
 }
 
@@ -787,8 +817,8 @@ section.card h2 {
 }
 
 .pkg.green {
-  background: var(--green-light);
-  border-color: var(--green);
+  background: #e5f8ee;
+  border-color: #35c98a;
   color: #2d7a4a;
 }
 
@@ -823,15 +853,34 @@ section.card h2 {
 }
 
 /* ===== SEND EMAIL BUTTON ===== */
+.send-email-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: auto;
+  min-height: 40px;
+}
+
+@media (min-width: 769px) {
+  .selected-packages-card .send-email-actions {
+    position: relative;
+    top: 14px;
+  }
+}
+
 .send-email-btn {
-  width: 100%;
-  padding: 14px 20px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #35c98a 0%, #159b68 100%);
-  color: var(--bg-white);
-  font-size: 15px;
-  font-weight: 600;
+  width: auto;
+  min-width: 0;
+  height: 40px;
+  margin-left: 0;
+  padding: 6px 12px;
+  border: 1px solid #176b4a;
+  border-radius: 6px;
+  background: #176b4a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -856,20 +905,20 @@ section.card h2 {
 }
 
 .clear-data-btn {
-  margin-top: 18px;
+  margin-top: 8px;
   padding: 10px 16px !important;
-  border: 1px solid #f0a6b8 !important;
+  border: 1px solid #d93048 !important;
   border-radius: 8px !important;
-  background: #fff1f4 !important;
-  color: #c45d78 !important;
+  background: #ffe1e7 !important;
+  color: #b4233c !important;
   font-size: 13px !important;
   font-weight: 600 !important;
   cursor: pointer;
 }
 
 .clear-data-btn:hover {
-  background: #ffe4eb !important;
-  border-color: #df7f99 !important;
+  background: #ffd0da !important;
+  border-color: #b4233c !important;
   box-shadow: none !important;
   transform: none !important;
 }
@@ -883,8 +932,8 @@ section.card h2 {
 
 .email-status {
   min-height: 22px;
-  margin: 10px 0 0;
-  text-align: center;
+  margin: 0;
+  text-align: right;
   font-size: 13px;
   font-weight: 600;
 }
@@ -1375,6 +1424,8 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):activ
     order: 3;
     width: calc(100% - 32px);
     margin: 0 16px 16px;
+    height: auto;
+    min-height: 0;
   }
 
   .sent-history-card {
@@ -1415,7 +1466,9 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):activ
   }
 
   .selected-packages-card #selectedPackagesContainer {
+    flex: 0 0 auto;
     gap: 8px;
+    max-height: none;
   }
 
   .pkg {
