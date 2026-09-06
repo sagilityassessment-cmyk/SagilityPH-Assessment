@@ -59,7 +59,7 @@ ${packageLines}
 Note:
 If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.
 
-Notification link: ${CANDIDATE_NOTIFICATION_URL}
+Notification link: Click here - ${CANDIDATE_NOTIFICATION_URL}
 
 Once notified, our Test Administrator will review your assessment status and proceed with checking your results.
 
@@ -99,7 +99,7 @@ ${location}`;
 
 function buildHtmlBody(candidateName, location, packages) {
   const packageLinks = packages.map(item =>
-    `<li><strong>${escapeHtml(item.name)}:</strong> <a href="${escapeAttribute(item.url)}">${escapeHtml(item.url)}</a></li>`
+    `<li><strong>${escapeHtml(item.name)}:</strong> <a href="${escapeAttribute(item.url)}">Click here</a></li>`
   ).join('');
 
   return `<p>Hi ${escapeHtml(candidateName)},</p>
@@ -108,7 +108,7 @@ function buildHtmlBody(candidateName, location, packages) {
 <ol>${packageLinks}</ol>
 <h3>Note:</h3>
 <p>If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.</p>
-<p><strong>Notify Test Administrator link:</strong> <a href="${escapeAttribute(CANDIDATE_NOTIFICATION_URL)}">${escapeHtml(CANDIDATE_NOTIFICATION_URL)}</a></p>
+<p><strong>Notify Test Administrator:</strong> <a href="${escapeAttribute(CANDIDATE_NOTIFICATION_URL)}">Click here</a></p>
 <p>Once notified, our Test Administrator will review your assessment status and proceed with checking your results.</p>
 <h3>Before You Start:</h3>
 <ul>
