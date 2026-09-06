@@ -21,14 +21,15 @@ function doPost(e) {
     const candidateEmail = String(request.email || '').trim();
     const location = String(request.location || '').trim();
     const packages = Array.isArray(request.packages) ? request.packages : [];
+    const isRetake = request.isRetake === true;
 
     if (!candidateName || !candidateEmail || !location || packages.length === 0) {
       return jsonResponse({ success: false, error: 'Name, email, location, and at least one package are required.' });
     }
 
-    const subject = `Sagility Assessment_ ${candidateName}_${location}`;
-    const plainTextBody = buildPlainTextBody(candidateName, location, packages);
-    const htmlBody = buildHtmlBody(candidateName, location, packages);
+    const subject = `${isRetake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_'}${candidateName}_${location}`;
+    const plainTextBody = buildPlainTextBody(candidateName, location, packages, isRetake);
+    const htmlBody = buildHtmlBody(candidateName, location, packages, isRetake);
 
     MailApp.sendEmail({
       to: candidateEmail,
@@ -45,14 +46,15 @@ function doPost(e) {
   }
 }
 
-function buildPlainTextBody(candidateName, location, packages) {
+function buildPlainTextBody(candidateName, location, packages, isRetake) {
   const packageLines = packages.map(item => `${item.name} - ${item.url}`).join('\n');
+  const introduction = isRetake
+    ? 'Sorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.'
+    : 'Good Day!\n\nPlease click link/s below to start your assessment.';
 
   return `Hi ${candidateName},
 
-Good Day!
-
-Please click link/s below to start your assessment.
+${introduction}
 
 ${packageLines}
 
@@ -97,14 +99,16 @@ Talent Acquisition- Sagility Recruitment - Test Admin
 ${location}`;
 }
 
-function buildHtmlBody(candidateName, location, packages) {
+function buildHtmlBody(candidateName, location, packages, isRetake) {
   const packageLinks = packages.map(item =>
     `<li><strong>${escapeHtml(item.name)}:</strong> <a href="${escapeAttribute(item.url)}">Click here</a></li>`
   ).join('');
+  const introduction = isRetake
+    ? '<p>Sorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.</p>'
+    : '<p>Good Day!</p><p>Please click link/s below to start your assessment.</p>';
 
   return `<p>Hi ${escapeHtml(candidateName)},</p>
-<p>Good Day!</p>
-<p>Please click link/s below to start your assessment.</p>
+${introduction}
 <ol>${packageLinks}</ol>
 <h3 style="margin-top: 24px;">Note:</h3>
 <p>If you have completed your assessment, please click the link below to notify our Test Admin that you have finished your assessment.</p>

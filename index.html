@@ -114,14 +114,20 @@
         </div>
         <div id="selectedPackagesContainer" class="selected-packages-scroll"></div>
         <div class="email-action-row">
+          <div class="email-action-controls">
+            <label class="retake-option">
+              <input id="retakeCheckbox" type="checkbox">
+              Click here if Retake Assessment
+            </label>
+            <button id="sendEmailBtn" class="send-email-btn" type="button">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
+                <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Send Email
+            </button>
+          </div>
           <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
-          <button id="sendEmailBtn" class="send-email-btn" type="button">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
-              <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            Send Email
-          </button>
         </div>
       </section>
 
@@ -441,7 +447,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script>
     // Paste your deployed Google Apps Script Web app URL here.
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBWkYWp2Dk_VKYd-QeN_Fqr9OC9o7uP2dobI4lGOlOjqz9MH69vzBq_rLqo1U3b1jQJA/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySwrZkHU1goTZqRCsfw5KGeNOHnoUAeDD8i_wmBfsLM66dewMd1RJFGWE_-IZQPEtBYQ/exec';
     const firebaseConfig = {
       apiKey: 'AIzaSyBZVAXmgE-24AVUFB_7xS4GQi4OwkIvptQ',
       authDomain: 'sagility-assessment.firebaseapp.com',
@@ -1120,6 +1126,7 @@
       const candidateName = document.getElementById('candidateNameInput').value.trim();
       const recipient = document.getElementById('emailInput').value.trim();
       const location = document.getElementById('locationInput').value.trim();
+      const isRetake = document.getElementById('retakeCheckbox').checked;
       const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')];
       const packages = selectedPackages.map(checkbox => ({
         name: checkbox.dataset.package,
@@ -1133,7 +1140,7 @@
         return;
       }
 
-      const payload = { name: candidateName, email: recipient, location, packages };
+      const payload = { name: candidateName, email: recipient, location, packages, isRetake };
       sendButton.disabled = true;
       emailStatus.textContent = 'Sending Assessment...........';
       emailStatus.className = 'email-status sending';
@@ -1168,8 +1175,11 @@
       const packageLinks = packages.map((item, index) =>
         `Package ${index + 1} - ${item.name}: ${item.url}`
       );
-      const subject = `Sagility Assessment_ ${candidateName}_${location}`;
-      const body = `Hi ${candidateName},\n\nGood Day!\n\nPlease click link/s below to start your assessment.\n\n${packageLinks.join('\n')}\n\nBefore You Start:\n\n• We recommend using a Laptop/PC and a headset.\n• Make sure you are in a quiet environment.\n• Use your active email address and enter the security code when prompted.\n• Read all instructions carefully before taking the assessment.\n\nNeed Assistance?\n\nIf you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.\n\nTime: 11am-8pm MNL\nLink: Meeting Invite\nMeeting ID: 479 656 747 406 7\nPasscode: vi3nV3NB\n\nImportant Reminders:\n\n⚠️ Use the assessment link only once.\n🔒 Do not share or forward the link.\n📍 The system records IP address and location.\n📇 Assessment materials are confidential. Any misuse may affect your application.\n\nFor questions or assistance, please contact:\nPHLTestAdmin@Sagilityhealth.com\n\nThank you, and good luck with your assessment!\n\nBest Regards,\n\nTalent Acquisition- Sagility Recruitment - Test Admin\n${location}`;
+      const subject = `${isRetake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_'}${candidateName}_${location}`;
+      const intro = isRetake
+        ? `Hi ${candidateName},\n\nSorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.\n\nPlease click link/s below to start your assessment.`
+        : `Hi ${candidateName},\n\nGood Day!\n\nPlease click link/s below to start your assessment.`;
+      const body = `${intro}\n\n${packageLinks.join('\n')}\n\nBefore You Start:\n\n• We recommend using a Laptop/PC and a headset.\n• Make sure you are in a quiet environment.\n• Use your active email address and enter the security code when prompted.\n• Read all instructions carefully before taking the assessment.\n\nNeed Assistance?\n\nIf you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.\n\nTime: 11am-8pm MNL\nLink: Meeting Invite\nMeeting ID: 479 656 747 406 7\nPasscode: vi3nV3NB\n\nImportant Reminders:\n\n⚠️ Use the assessment link only once.\n🔒 Do not share or forward the link.\n📍 The system records IP address and location.\n📇 Assessment materials are confidential. Any misuse may affect your application.\n\nFor questions or assistance, please contact:\nPHLTestAdmin@Sagilityhealth.com\n\nThank you, and good luck with your assessment!\n\nBest Regards,\n\nTalent Acquisition- Sagility Recruitment - Test Admin\n${location}`;
       window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       await addSentHistory(candidateName, recipient, location);
       emailStatus.textContent = 'Email draft opened.';
@@ -1181,6 +1191,7 @@
       document.getElementById('candidateNameInput').value = '';
       document.getElementById('emailInput').value = '';
       document.getElementById('locationInput').selectedIndex = 0;
+      document.getElementById('retakeCheckbox').checked = false;
       document.querySelectorAll('.package-checkbox').forEach(checkbox => {
         checkbox.checked = false;
         updatePackageItemUI(checkbox);

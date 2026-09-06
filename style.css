@@ -1209,11 +1209,35 @@ section.card h2 {
 
 .email-action-row {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  min-height: 38px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
   margin-top: auto;
+}
+
+.email-action-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+}
+
+.retake-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-blue);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.retake-option input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary-dark);
 }
 
 .send-email-btn:hover {
@@ -1259,8 +1283,8 @@ section.card h2 {
 
 .email-status {
   min-height: 0;
-  margin: 0 auto 0 0;
-  text-align: left;
+  margin: 8px 0 0;
+  text-align: center;
   font-size: 13px;
   font-weight: 600;
 }
