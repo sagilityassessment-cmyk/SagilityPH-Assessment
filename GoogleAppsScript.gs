@@ -57,11 +57,11 @@ Please click link/s below to start your assessment.
 ${packageLines}
 
 Note:
-If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.
+If you have completed your assessment, please click the link below to notify our Test Admin that you have finished your assessment.
 
 Notification link: Click here - ${CANDIDATE_NOTIFICATION_URL}
 
-Once notified, our Test Administrator will review your assessment status and proceed with checking your results.
+Once notified, our Test Admin will review your assessment status and proceed with checking your results.
 
 Before You Start:
 
@@ -107,9 +107,9 @@ function buildHtmlBody(candidateName, location, packages) {
 <p>Please click link/s below to start your assessment.</p>
 <ol>${packageLinks}</ol>
 <h3 style="margin-top: 24px;">Note:</h3>
-<p>If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.</p>
-<p><strong>Notify Test Administrator:</strong> <a href="${escapeAttribute(CANDIDATE_NOTIFICATION_URL)}">Click here</a></p>
-<p>Once notified, our Test Administrator will review your assessment status and proceed with checking your results.</p>
+<p>If you have completed your assessment, please click the link below to notify our Test Admin that you have finished your assessment.</p>
+<p><strong>Notify Test Admin:</strong> <a href="${escapeAttribute(CANDIDATE_NOTIFICATION_URL)}">Click here</a></p>
+<p>Once notified, our Test Admin will review your assessment status and proceed with checking your results.</p>
 <h3>Before You Start:</h3>
 <ul>
 <li>We recommend using a laptop or desktop computer and a headset for the best experience. However, if a laptop or desktop computer is not available, you may use your mobile device to complete the assessment.</li>
