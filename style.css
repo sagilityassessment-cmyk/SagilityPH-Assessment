@@ -43,7 +43,6 @@
 }
 
 html, body {
-  height: 100%;
   width: 100%;
   scroll-behavior: smooth;
 }
@@ -59,9 +58,12 @@ body {
   background-size: cover;
   color: var(--text-dark);
   line-height: 1.6;
+  min-height: 100vh;
+  height: auto;
   position: relative;
   overflow-x: hidden;
   padding-top: 157px;
+  padding-bottom: 20px;
 }
 
 body::before {
@@ -286,7 +288,7 @@ main.grid {
   gap: 24px;
   padding: 24px;
   max-width: 1472px;
-  margin: 0 auto;
+  margin: 20px auto 0;
   position: relative;
   z-index: 1;
   align-items: stretch;
@@ -330,7 +332,7 @@ main.grid {
 
 .notification-report-section {
   margin-top: 26px;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .notification-report-heading {
@@ -342,7 +344,7 @@ main.grid {
 }
 
 .notification-report-heading .packages-subtitle {
-  margin-bottom: 18px;
+  margin: 4px 0 18px;
 }
 
 .notification-report-actions {
@@ -1649,11 +1651,13 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     display: flex;
     flex-direction: column;
     padding-top: 172px;
+    padding-bottom: 20px;
   }
 
   .notification-report-section {
     display: flex;
     flex-direction: column;
+    margin-bottom: 20px;
   }
 
   .notification-report-heading {

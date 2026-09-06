@@ -57,11 +57,11 @@ Please click link/s below to start your assessment.
 ${packageLines}
 
 Note:
-If you have completed your assessment, please click the link below to notify our Test Admin that you have finished your assessment.
+If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.
 
 Notification link: ${CANDIDATE_NOTIFICATION_URL}
 
-Once notified, our Test Admin will review your assessment status and proceed with checking your results.
+Once notified, our Test Administrator will review your assessment status and proceed with checking your results.
 
 Before You Start:
 
