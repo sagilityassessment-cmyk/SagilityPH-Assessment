@@ -16,6 +16,37 @@ service cloud.firestore {
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recordId']) &&
           resource.data.recordId == '' &&
           request.resource.data.recordId == recordId
+        ) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+          request.resource.data.status in ['No Status', 'Done']
+        ) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['candidateNotifiedAt']) &&
+          request.resource.data.candidateNotifiedAt is int
+        )
+      );
+
+      allow delete: if false;
+    }
+
+    match /notificationHistory/{recordId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+
+      allow update: if request.auth != null && (
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recordId']) &&
+          resource.data.recordId == '' &&
+          request.resource.data.recordId == recordId
+        ) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+          request.resource.data.status in ['No Status', 'Done']
+        ) ||
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['candidateNotifiedAt']) &&
+          request.resource.data.candidateNotifiedAt is int
         )
       );
 

@@ -52,9 +52,9 @@
   <!-- MAIN CONTENT GRID -->
   <main class="grid">
     <!-- LEFT SIDE: CANDIDATE INFORMATION -->
-    <section class="card">
+    <section class="card candidate-info-card">
       <div class="card-header">
-        <svg class="card-icon candidate-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
@@ -88,8 +88,8 @@
           </svg>
           Location
         </label>
-        <select id="locationInput">
-          <option>Select Location</option>
+        <select id="locationInput" required>
+          <option value="" disabled selected hidden>Select Location</option>
           <option>Iloilo City</option>
           <option>Bohol</option>
           <option>Alabang</option>
@@ -104,15 +104,16 @@
       <!-- SELECTED PACKAGES CARD -->
       <section class="card selected-packages-card">
         <div class="card-header">
-          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="20" r="1"></circle>
-            <circle cx="19" cy="20" r="1"></circle>
-            <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 8H6"></path>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
+            <path d="M12 3h5.5A2.5 2.5 0 0 1 20 5.5v16a2.5 2.5 0 0 0-2.5-2.5H12"></path>
+            <path d="m16.5 7.5 2 2"></path>
+            <path d="m14.5 13.5 4-4 1.5 1.5-4 4-2 .5z"></path>
           </svg>
           <h2>Selected Package(s)</h2>
         </div>
         <div id="selectedPackagesContainer" class="selected-packages-scroll"></div>
-        <div class="send-email-actions">
+        <div class="email-action-row">
           <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
           <button id="sendEmailBtn" class="send-email-btn" type="button">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -385,6 +386,56 @@
     </div>
   </section>
 
+  <section id="notificationReport" class="card reports-section notification-report-section">
+    <div class="notification-report-heading">
+      <div>
+        <h2>Candidates Notification Report Status</h2>
+        <p class="packages-subtitle">Candidate completion status by location</p>
+      </div>
+      <div class="notification-report-actions">
+        <a class="notification-candidate-login" href="candidate.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Candidate Login
+        </a>
+        <div class="notification-report-reset">
+          <input id="notificationResetPasswordInput" type="password" placeholder="Password" aria-label="Notification report reset password">
+          <button id="clearNotificationReportBtn" class="history-delete-selected" type="button">Start New Report</button>
+        </div>
+        <div class="notification-search-controls">
+          <label class="notification-search-field">
+            <input id="notificationSearchInput" type="search" placeholder="Filter Data" aria-label="Filter notification report">
+          </label>
+          <button id="notificationSearchBtn" class="notification-search-button" type="button">Search</button>
+        </div>
+      </div>
+    </div>
+    <div class="notification-report-overview">
+      <table class="reports-table notification-summary-table">
+        <thead>
+          <tr><th>Location</th><th>Count</th><th>No Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Quezon City</td><td id="notificationCount-quezon-city">0</td><td id="notificationNoStatus-quezon-city">0</td></tr>
+          <tr><td>Iloilo City</td><td id="notificationCount-iloilo-city">0</td><td id="notificationNoStatus-iloilo-city">0</td></tr>
+          <tr><td>Alabang</td><td id="notificationCount-alabang">0</td><td id="notificationNoStatus-alabang">0</td></tr>
+          <tr><td>Bohol</td><td id="notificationCount-bohol">0</td><td id="notificationNoStatus-bohol">0</td></tr>
+        </tbody>
+      </table>
+      <div id="notificationStatusChart" class="notification-status-chart" aria-label="Notification count and no status chart"></div>
+    </div>
+    <div class="notification-details-scroll">
+      <table class="reports-table notification-details-table">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Email</th><th>Location</th><th>Date and Time</th><th>Status</th></tr>
+        </thead>
+        <tbody id="notificationDetailsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -404,9 +455,23 @@
     firebase.initializeApp(firebaseConfig);
     const firestore = firebase.firestore();
     const firebaseAuthReady = firebase.auth().signInAnonymously();
+
+    async function ensureFirebaseAuth() {
+      try {
+        await firebaseAuthReady;
+      } catch {
+      }
+      if (!firebase.auth().currentUser) {
+        await firebase.auth().signInAnonymously();
+      }
+      await firebase.auth().currentUser.getIdToken(true);
+    }
+
     const LOCAL_STORAGE_KEY = 'sagility-assessment-state';
     const HISTORY_DELETE_KEY = 'sagility-assessment-hidden-history';
     let sentHistoryRecords = [];
+    let notificationRecords = [];
+    const pendingNotificationStatuses = new Map();
 
     function getPersistedState() {
       try {
@@ -625,7 +690,23 @@
     }
 
     function getVisibleHistoryRecords() {
-      return sentHistoryRecords.filter(item => !isHiddenHistoryRecord(item) && !isDeletedHistoryRecord(item));
+      return sentHistoryRecords.filter(item => !String(item.source || '').startsWith('candidate-notification') && !isHiddenHistoryRecord(item) && !isDeletedHistoryRecord(item));
+    }
+
+    function getVisibleNotificationRecords() {
+      return sentHistoryRecords.filter(item => String(item.source || '').startsWith('candidate-notification') && !item.deleted);
+    }
+
+    function getLatestNotificationRecords() {
+      const seen = new Set();
+      return getVisibleNotificationRecords()
+        .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0))
+        .filter(item => {
+          const key = `${String(item.name || '').toLowerCase()}|${String(item.email || '').toLowerCase()}|${normalizeLocation(item.location)}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
     }
 
     function updateDeleteSelectedButtonState() {
@@ -672,12 +753,21 @@
 
     function renderReports() {
       const currentDateKey = getManilaDateKey();
+      const notificationSearch = document.getElementById('notificationSearchInput')?.value.trim().toLowerCase() || '';
+      const matchesNotificationSearch = item => !notificationSearch || `${item.name || ''} ${item.email || ''} ${item.location || ''}`.toLowerCase().includes(notificationSearch);
       const counts = {
         'Quezon City': 0,
         'Iloilo City': 0,
         'Alabang': 0,
         'Bohol': 0
       };
+      const notificationCounts = {
+        'Quezon City': 0,
+        'Iloilo City': 0,
+        'Alabang': 0,
+        'Bohol': 0
+      };
+      const statusCounts = Object.fromEntries(Object.keys(notificationCounts).map(location => [location, { 'No Status': 0, Done: 0 }]));
       const countedEmails = new Set();
       getVisibleHistoryRecords()
         .filter(item => getRecordDateKey(item) === currentDateKey)
@@ -686,7 +776,19 @@
           if (!email || countedEmails.has(email)) return;
           countedEmails.add(email);
           const location = normalizeLocation(item.location);
-          if (counts[location] !== undefined) counts[location] += 1;
+          if (counts[location] !== undefined) {
+            counts[location] += 1;
+          }
+        });
+      getLatestNotificationRecords()
+        .filter(item => getRecordDateKey(item) === currentDateKey)
+        .forEach(item => {
+          const location = normalizeLocation(item.location);
+          const status = item.status === 'Done' ? 'Done' : 'No Status';
+          if (notificationCounts[location] !== undefined) {
+            notificationCounts[location] += 1;
+            statusCounts[location][status] += 1;
+          }
         });
 
       const locations = Object.keys(counts);
@@ -696,7 +798,80 @@
         const countCellId = `reportCount-${location.toLowerCase().replaceAll(' ', '-')}`;
         const countCell = document.getElementById(countCellId);
         if (countCell) countCell.textContent = counts[location];
+        const notificationCountCell = document.getElementById(`notificationCount-${location.toLowerCase().replaceAll(' ', '-')}`);
+        if (notificationCountCell) notificationCountCell.textContent = notificationCounts[location];
+        const noStatusCell = document.getElementById(`notificationNoStatus-${location.toLowerCase().replaceAll(' ', '-')}`);
+        if (noStatusCell) noStatusCell.textContent = statusCounts[location]['No Status'];
       });
+      const detailsBody = document.getElementById('notificationDetailsBody');
+      if (detailsBody) {
+        const records = getLatestNotificationRecords()
+          .filter(item => getRecordDateKey(item) === currentDateKey)
+          .filter(matchesNotificationSearch)
+          .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0));
+        detailsBody.innerHTML = records.length
+          ? records.map((item, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${escapeHtml(item.name || '')}</td>
+              <td>${escapeHtml(item.email || '')}</td>
+              <td>${escapeHtml(item.location || '')}</td>
+              <td>${escapeHtml(item.date || '')}</td>
+              <td>
+                <label class="notification-status-cell">
+                  <input type="checkbox" class="notification-status-checkbox" data-record-id="${item.recordId || ''}" data-name="${escapeHtml(item.name || '')}" data-email="${escapeHtml(item.email || '')}" data-location="${escapeHtml(item.location || '')}"${item.status === 'Done' ? ' checked' : ''}>
+                  <span>${item.status === 'Done' ? 'Done' : 'No Status'}</span>
+                </label>
+              </td>
+            </tr>`).join('')
+          : '<tr><td colspan="6">No candidate notifications yet</td></tr>';
+        detailsBody.querySelectorAll('.notification-status-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('change', async () => {
+            const statusLabel = checkbox.closest('.notification-status-cell').querySelector('span');
+            const status = checkbox.checked ? 'Done' : 'No Status';
+            statusLabel.textContent = status;
+            try {
+              await updateHistoryStatus(checkbox.dataset.recordId, status);
+            } catch (error) {
+              pendingNotificationStatuses.delete(checkbox.dataset.recordId);
+              checkbox.checked = !checkbox.checked;
+              statusLabel.textContent = checkbox.checked ? 'Done' : 'No Status';
+              const errorDetails = error?.code ? `${error.code}: ${error.message || 'permission denied'}` : (error?.message || 'Unknown error');
+              alert(`Unable to save the status. ${errorDetails}`);
+              console.error('Firestore status update failed:', error);
+            }
+          });
+        });
+
+      }
+      const notificationStatusChart = document.getElementById('notificationStatusChart');
+      if (notificationStatusChart) {
+        const maxNotificationValue = Math.max(...locations.flatMap(location => [
+          notificationCounts[location],
+          statusCounts[location]['No Status']
+        ]), 1);
+        notificationStatusChart.innerHTML = `
+          <div class="notification-chart-legend">
+            <span><i class="notification-chart-swatch count"></i>Count</span>
+            <span><i class="notification-chart-swatch no-status"></i>No Status</span>
+          </div>
+          <div class="notification-chart-columns">
+            ${locations.map(location => `
+              <div class="notification-chart-location">
+                <div class="notification-chart-bars">
+                  <div class="notification-chart-bar-wrap" title="${escapeHtml(location)} Count: ${notificationCounts[location]}">
+                    <strong>${notificationCounts[location]}</strong>
+                    <div class="notification-chart-bar count" style="height: ${(notificationCounts[location] / maxNotificationValue) * 100}%"></div>
+                  </div>
+                  <div class="notification-chart-bar-wrap" title="${escapeHtml(location)} No Status: ${statusCounts[location]['No Status']}">
+                    <strong>${statusCounts[location]['No Status']}</strong>
+                    <div class="notification-chart-bar no-status" style="height: ${(statusCounts[location]['No Status'] / maxNotificationValue) * 100}%"></div>
+                  </div>
+                </div>
+                <span>${escapeHtml(location)}</span>
+              </div>`).join('')}
+          </div>`;
+      }
       const totalCountElement = document.getElementById('reportTotalCount');
       if (totalCountElement) totalCountElement.textContent = totalCount;
       const chart = document.getElementById('reportChart');
@@ -778,16 +953,37 @@
       return docRef.id;
     }
 
+    async function updateHistoryStatus(recordId, status) {
+      if (!recordId) return;
+      pendingNotificationStatuses.set(recordId, status);
+      const record = sentHistoryRecords.find(item => item.recordId === recordId);
+      if (record) record.status = status;
+      notificationRecords = sentHistoryRecords.filter(item => String(item.source || '').startsWith('candidate-notification'));
+      renderReports();
+
+      await ensureFirebaseAuth();
+      await firestore.collection('sentHistory').doc(recordId).update({ status });
+    }
+
     function initializeFirebaseHistory() {
-      firebaseAuthReady
+      ensureFirebaseAuth()
         .then(() => {
           firestore.collection('sentHistory')
             .orderBy('timestamp', 'desc')
             .onSnapshot(snapshot => {
-              sentHistoryRecords = snapshot.docs.map(document => ({
-                ...document.data(),
-                recordId: document.id
-              }));
+              sentHistoryRecords = snapshot.docs.map(document => {
+                const data = document.data();
+                const pendingStatus = pendingNotificationStatuses.get(document.id);
+                if (pendingStatus && data.status === pendingStatus) {
+                  pendingNotificationStatuses.delete(document.id);
+                }
+                return {
+                  ...data,
+                  status: pendingStatus || data.status,
+                  recordId: document.id
+                };
+              });
+              notificationRecords = sentHistoryRecords.filter(item => String(item.source || '').startsWith('candidate-notification'));
               renderSentHistory(document.getElementById('historySearchInput').value);
               renderReports();
             }, error => {
@@ -807,7 +1003,50 @@
       renderSentHistory(event.target.value);
     });
 
+    document.getElementById('notificationSearchInput').addEventListener('input', renderReports);
+    document.getElementById('notificationSearchBtn').addEventListener('click', renderReports);
+
     document.getElementById('exportDataBtn').addEventListener('click', exportHistoryCsv);
+
+    document.getElementById('clearNotificationReportBtn').addEventListener('click', async () => {
+      const notificationIds = getVisibleNotificationRecords()
+        .map(record => record.recordId)
+        .filter(Boolean);
+      if (!notificationIds.length) {
+        alert('The notification report is already empty.');
+        return;
+      }
+
+      const passwordInput = document.getElementById('notificationResetPasswordInput');
+      if (passwordInput.value !== 'Sagility_1') {
+        alert('Incorrect password.');
+        return;
+      }
+
+      const clearButton = document.getElementById('clearNotificationReportBtn');
+      clearButton.disabled = true;
+      try {
+        await firebaseAuthReady;
+        const batch = firestore.batch();
+        notificationIds.forEach(recordId => batch.update(firestore.collection('sentHistory').doc(recordId), {
+          deleted: true,
+          deletedAt: Date.now()
+        }));
+        await batch.commit();
+
+        const deletedIds = new Set(notificationIds);
+        sentHistoryRecords = sentHistoryRecords.filter(record => !deletedIds.has(record.recordId));
+        notificationRecords = notificationRecords.filter(record => !deletedIds.has(record.recordId));
+        renderReports();
+        passwordInput.value = '';
+        alert('Notification report cleared. You can now send new candidate notifications.');
+      } catch (error) {
+        console.error('Notification report reset failed:', error);
+        alert('Unable to clear the notification report. Please check the Firestore permissions and try again.');
+      } finally {
+        clearButton.disabled = false;
+      }
+    });
 
     document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', async () => {
       const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
@@ -896,7 +1135,7 @@
 
       const payload = { name: candidateName, email: recipient, location, packages };
       sendButton.disabled = true;
-      emailStatus.textContent = 'Sending assessment. Please wait....';
+      emailStatus.textContent = 'Sending Assessment...........';
       emailStatus.className = 'email-status sending';
 
       if (GOOGLE_SCRIPT_URL) {
@@ -907,7 +1146,7 @@
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
           });
-          emailStatus.textContent = 'Successfully sent.';
+          emailStatus.textContent = 'Successfully Sent.';
           emailStatus.className = 'email-status success';
 
           try {
