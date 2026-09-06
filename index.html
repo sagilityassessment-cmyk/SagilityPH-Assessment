@@ -388,6 +388,9 @@
       <label for="exportDateInput">Export date</label>
       <input id="exportDateInput" type="date">
       <button id="exportDataBtn" class="export-data-btn" type="button">Export Data</button>
+      <label for="exportMonthInput">Export month</label>
+      <input id="exportMonthInput" type="month">
+      <button id="exportMonthBtn" class="export-data-btn" type="button">Export Month</button>
       <p id="exportStatus" class="export-status" role="status" aria-live="polite"></p>
     </div>
   </section>
@@ -406,16 +409,6 @@
           </svg>
           Candidate Login
         </a>
-        <div class="notification-report-reset">
-          <input id="notificationResetPasswordInput" type="password" placeholder="Password" aria-label="Notification report reset password">
-          <button id="clearNotificationReportBtn" class="history-delete-selected" type="button">Start New Report</button>
-        </div>
-        <div class="notification-search-controls">
-          <label class="notification-search-field">
-            <input id="notificationSearchInput" type="search" placeholder="Filter Data" aria-label="Filter notification report">
-          </label>
-          <button id="notificationSearchBtn" class="notification-search-button" type="button">Search</button>
-        </div>
       </div>
     </div>
     <div class="notification-report-overview">
@@ -432,13 +425,33 @@
       </table>
       <div id="notificationStatusChart" class="notification-status-chart" aria-label="Notification count and no status chart"></div>
     </div>
+    <div class="notification-search-controls notification-details-search-controls">
+      <label class="notification-search-field">
+        <input id="notificationSearchInput" type="search" placeholder="Filter Data" aria-label="Filter notification report">
+      </label>
+      <button id="notificationSearchBtn" class="notification-search-button" type="button">Search</button>
+    </div>
     <div class="notification-details-scroll">
       <table class="reports-table notification-details-table">
         <thead>
-          <tr><th>#</th><th>Name</th><th>Email</th><th>Location</th><th>Date and Time</th><th>Status</th></tr>
+          <tr><th>#</th><th>Name</th><th>Email</th><th>Location</th><th>Date and Time</th><th>Status</th><th>Delete</th></tr>
         </thead>
         <tbody id="notificationDetailsBody"></tbody>
       </table>
+    </div>
+    <div class="notification-export-row">
+      <div class="export-controls notification-export-controls">
+        <label for="notificationExportDateInput">Export date</label>
+        <input id="notificationExportDateInput" type="date">
+        <button id="notificationExportDataBtn" class="export-data-btn" type="button">Export Data</button>
+        <label for="notificationExportMonthInput">Export month</label>
+        <input id="notificationExportMonthInput" type="month">
+        <button id="notificationExportMonthBtn" class="export-data-btn" type="button">Export Month</button>
+        <p id="notificationExportStatus" class="export-status" role="status" aria-live="polite"></p>
+      </div>
+      <div class="notification-delete-controls">
+        <button id="deleteSelectedNotificationsBtn" class="history-delete-selected" type="button" disabled>Delete</button>
+      </div>
     </div>
   </section>
 
@@ -722,6 +735,13 @@
       deleteButton.textContent = count > 0 ? `Delete (${count})` : 'Delete';
     }
 
+    function updateDeleteNotificationButtonState() {
+      const deleteButton = document.getElementById('deleteSelectedNotificationsBtn');
+      const count = document.querySelectorAll('.notification-delete-checkbox:checked').length;
+      deleteButton.disabled = count === 0;
+      deleteButton.textContent = count > 0 ? `Delete (${count})` : 'Delete';
+    }
+
     function renderSentHistory(searchTerm = '') {
       const search = searchTerm.trim().toLowerCase();
       const currentDateKey = getManilaDateKey();
@@ -829,8 +849,11 @@
                   <span>${item.status === 'Done' ? 'Done' : 'No Status'}</span>
                 </label>
               </td>
+              <td>
+                <input type="checkbox" class="notification-delete-checkbox" data-record-id="${item.recordId || ''}" aria-label="Select notification record for deletion">
+              </td>
             </tr>`).join('')
-          : '<tr><td colspan="6">No candidate notifications yet</td></tr>';
+          : '<tr><td colspan="7">No candidate notifications yet</td></tr>';
         detailsBody.querySelectorAll('.notification-status-checkbox').forEach(checkbox => {
           checkbox.addEventListener('change', async () => {
             const statusLabel = checkbox.closest('.notification-status-cell').querySelector('span');
@@ -848,6 +871,9 @@
             }
           });
         });
+        detailsBody.querySelectorAll('.notification-delete-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('change', updateDeleteNotificationButtonState);
+        });
 
       }
       const notificationStatusChart = document.getElementById('notificationStatusChart');
@@ -856,27 +882,27 @@
           notificationCounts[location],
           statusCounts[location]['No Status']
         ]), 1);
-        notificationStatusChart.innerHTML = `
-          <div class="notification-chart-legend">
-            <span><i class="notification-chart-swatch count"></i>Count</span>
-            <span><i class="notification-chart-swatch no-status"></i>No Status</span>
-          </div>
-          <div class="notification-chart-columns">
-            ${locations.map(location => `
-              <div class="notification-chart-location">
-                <div class="notification-chart-bars">
-                  <div class="notification-chart-bar-wrap" title="${escapeHtml(location)} Count: ${notificationCounts[location]}">
-                    <strong>${notificationCounts[location]}</strong>
-                    <div class="notification-chart-bar count" style="height: ${(notificationCounts[location] / maxNotificationValue) * 100}%"></div>
+        const renderNotificationGraph = (title, type, values) => `
+          <div class="notification-mini-chart">
+            <div class="notification-mini-chart-title">
+              <i class="notification-chart-swatch ${type}"></i>${title}
+            </div>
+            <div class="notification-chart-columns">
+              ${locations.map(location => `
+                <div class="notification-chart-location">
+                  <div class="notification-chart-bars">
+                    <div class="notification-chart-bar-wrap" title="${escapeHtml(location)} ${title}: ${values[location]}">
+                      <strong>${values[location]}</strong>
+                      <div class="notification-chart-bar ${type}" style="height: ${(values[location] / maxNotificationValue) * 100}%"></div>
+                    </div>
                   </div>
-                  <div class="notification-chart-bar-wrap" title="${escapeHtml(location)} No Status: ${statusCounts[location]['No Status']}">
-                    <strong>${statusCounts[location]['No Status']}</strong>
-                    <div class="notification-chart-bar no-status" style="height: ${(statusCounts[location]['No Status'] / maxNotificationValue) * 100}%"></div>
-                  </div>
-                </div>
-                <span>${escapeHtml(location)}</span>
-              </div>`).join('')}
+                  <span>${escapeHtml(location)}</span>
+                </div>`).join('')}
+            </div>
           </div>`;
+        notificationStatusChart.innerHTML = `
+          ${renderNotificationGraph('Count', 'count', notificationCounts)}
+          ${renderNotificationGraph('No Status', 'no-status', Object.fromEntries(locations.map(location => [location, statusCounts[location]['No Status']])))}`;
       }
       const totalCountElement = document.getElementById('reportTotalCount');
       if (totalCountElement) totalCountElement.textContent = totalCount;
@@ -892,36 +918,36 @@
         : '<p class="report-empty">No assessments today</p>';
     }
 
-    function dateKeyToUtc(dateKey) {
-      const [year, month, day] = dateKey.split('-').map(Number);
-      return Date.UTC(year, month - 1, day);
-    }
-
     function csvValue(value) {
       return `"${String(value ?? '').replace(/"/g, '""')}"`;
     }
 
-    function exportHistoryCsv() {
+    function downloadCsv(filename, rows) {
+      const csv = rows.map(row => row.map(csvValue).join(',')).join('\r\n');
+      const downloadUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+    }
+
+    function exportHistoryCsv(period = 'day') {
       const selectedDate = document.getElementById('exportDateInput').value;
+      const selectedMonth = document.getElementById('exportMonthInput').value;
       const exportStatus = document.getElementById('exportStatus');
-      if (!selectedDate) {
-        exportStatus.textContent = 'Choose a date first.';
+      const selectedPeriod = period === 'month' ? selectedMonth : selectedDate;
+      if (!selectedPeriod) {
+        exportStatus.textContent = period === 'month' ? 'Choose a month first.' : 'Choose a date first.';
         exportStatus.className = 'export-status error';
         return;
       }
 
-      const todayUtc = dateKeyToUtc(getManilaDateKey());
-      const selectedUtc = dateKeyToUtc(selectedDate);
-      const ageInDays = Math.floor((todayUtc - selectedUtc) / 86400000);
-      if (ageInDays < 0 || ageInDays > 6) {
-        exportStatus.textContent = 'Only the last 7 days can be exported.';
-        exportStatus.className = 'export-status error';
-        return;
-      }
-
-      const records = getVisibleHistoryRecords().filter(item => getRecordDateKey(item) === selectedDate);
+      const records = getVisibleHistoryRecords().filter(item => period === 'month'
+        ? getRecordDateKey(item).startsWith(selectedMonth)
+        : getRecordDateKey(item) === selectedDate);
       if (records.length === 0) {
-        exportStatus.textContent = 'No records found for that date.';
+        exportStatus.textContent = period === 'month' ? 'No records found for that month.' : 'No records found for that date.';
         exportStatus.className = 'export-status error';
         return;
       }
@@ -930,14 +956,37 @@
         ['Name', 'Email', 'Date and Time', 'Location'],
         ...records.map(item => [item.name, item.email, item.date, normalizeLocation(item.location)])
       ];
-      const csv = rows.map(row => row.map(csvValue).join(',')).join('\r\n');
-      const downloadUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `sagility-assessments-${selectedDate}.csv`;
-      link.click();
-      URL.revokeObjectURL(downloadUrl);
+      downloadCsv(`sagility-assessments-${selectedPeriod}.csv`, rows);
       exportStatus.textContent = `${records.length} record(s) exported.`;
+      exportStatus.className = 'export-status success';
+    }
+
+    function exportNotificationCsv(period = 'day') {
+      const selectedDate = document.getElementById('notificationExportDateInput').value;
+      const selectedMonth = document.getElementById('notificationExportMonthInput').value;
+      const exportStatus = document.getElementById('notificationExportStatus');
+      const selectedPeriod = period === 'month' ? selectedMonth : selectedDate;
+      if (!selectedPeriod) {
+        exportStatus.textContent = period === 'month' ? 'Choose a month first.' : 'Choose a date first.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+
+      const records = getVisibleNotificationRecords().filter(item => period === 'month'
+        ? getRecordDateKey(item).startsWith(selectedMonth)
+        : getRecordDateKey(item) === selectedDate);
+      if (records.length === 0) {
+        exportStatus.textContent = period === 'month' ? 'No notification records found for that month.' : 'No notification records found for that date.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+
+      const rows = [
+        ['Name', 'Email', 'Location', 'Date and Time', 'Status'],
+        ...records.map(item => [item.name, item.email, normalizeLocation(item.location), item.date, item.status === 'Done' ? 'Done' : 'No Status'])
+      ];
+      downloadCsv(`sagility-notifications-${selectedPeriod}.csv`, rows);
+      exportStatus.textContent = `${records.length} notification record(s) exported.`;
       exportStatus.className = 'export-status success';
     }
 
@@ -1012,47 +1061,10 @@
     document.getElementById('notificationSearchInput').addEventListener('input', renderReports);
     document.getElementById('notificationSearchBtn').addEventListener('click', renderReports);
 
-    document.getElementById('exportDataBtn').addEventListener('click', exportHistoryCsv);
-
-    document.getElementById('clearNotificationReportBtn').addEventListener('click', async () => {
-      const notificationIds = getVisibleNotificationRecords()
-        .map(record => record.recordId)
-        .filter(Boolean);
-      if (!notificationIds.length) {
-        alert('The notification report is already empty.');
-        return;
-      }
-
-      const passwordInput = document.getElementById('notificationResetPasswordInput');
-      if (passwordInput.value !== 'Sagility_1') {
-        alert('Incorrect password.');
-        return;
-      }
-
-      const clearButton = document.getElementById('clearNotificationReportBtn');
-      clearButton.disabled = true;
-      try {
-        await firebaseAuthReady;
-        const batch = firestore.batch();
-        notificationIds.forEach(recordId => batch.update(firestore.collection('sentHistory').doc(recordId), {
-          deleted: true,
-          deletedAt: Date.now()
-        }));
-        await batch.commit();
-
-        const deletedIds = new Set(notificationIds);
-        sentHistoryRecords = sentHistoryRecords.filter(record => !deletedIds.has(record.recordId));
-        notificationRecords = notificationRecords.filter(record => !deletedIds.has(record.recordId));
-        renderReports();
-        passwordInput.value = '';
-        alert('Notification report cleared. You can now send new candidate notifications.');
-      } catch (error) {
-        console.error('Notification report reset failed:', error);
-        alert('Unable to clear the notification report. Please check the Firestore permissions and try again.');
-      } finally {
-        clearButton.disabled = false;
-      }
-    });
+    document.getElementById('exportDataBtn').addEventListener('click', () => exportHistoryCsv('day'));
+    document.getElementById('exportMonthBtn').addEventListener('click', () => exportHistoryCsv('month'));
+    document.getElementById('notificationExportDataBtn').addEventListener('click', () => exportNotificationCsv('day'));
+    document.getElementById('notificationExportMonthBtn').addEventListener('click', () => exportNotificationCsv('month'));
 
     document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', async () => {
       const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
@@ -1097,8 +1109,46 @@
       }
     });
 
+    document.getElementById('deleteSelectedNotificationsBtn').addEventListener('click', async () => {
+      const deleteButton = document.getElementById('deleteSelectedNotificationsBtn');
+      const selectedCheckboxes = document.querySelectorAll('.notification-delete-checkbox:checked');
+      if (!selectedCheckboxes.length) return;
+
+      const passwordInput = window.prompt('Enter password to delete notification records:');
+      if (passwordInput !== 'Sagility_1') {
+        if (passwordInput !== null) alert('Incorrect password.');
+        return;
+      }
+
+      if (!window.confirm('Delete selected notification records?')) return;
+      const ids = [...selectedCheckboxes].map(checkbox => checkbox.dataset.recordId).filter(Boolean);
+      if (!ids.length) return;
+
+      deleteButton.disabled = true;
+      try {
+        await firebaseAuthReady;
+        const batch = firestore.batch();
+        ids.forEach(id => batch.update(firestore.collection('sentHistory').doc(id), {
+          deleted: true,
+          deletedAt: Date.now()
+        }));
+        await batch.commit();
+
+        const deletedIds = new Set(ids);
+        sentHistoryRecords = sentHistoryRecords.filter(record => !deletedIds.has(record.recordId));
+        notificationRecords = notificationRecords.filter(record => !deletedIds.has(record.recordId));
+        renderReports();
+        updateDeleteNotificationButtonState();
+      } catch (error) {
+        console.error('Notification record delete failed:', error);
+        alert('Unable to delete the selected notification records. Please check the Firestore permissions and try again.');
+        updateDeleteNotificationButtonState();
+      }
+    });
+
     setInterval(() => {
       renderSentHistory(document.getElementById('historySearchInput').value);
+      renderReports();
     }, 60000);
 
     // Update individual package item UI

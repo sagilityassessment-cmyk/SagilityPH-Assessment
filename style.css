@@ -405,6 +405,11 @@ main.grid {
   gap: 8px;
 }
 
+.notification-details-search-controls {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
 .notification-search-button {
   width: 86px;
   height: 42px;
@@ -502,7 +507,7 @@ main.grid {
 
 .notification-report-overview {
   display: grid;
-  grid-template-columns: minmax(320px, 42%) 1fr;
+  grid-template-columns: minmax(220px, 34%) minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
   margin-top: 18px;
@@ -510,7 +515,26 @@ main.grid {
 
 .notification-status-chart {
   min-width: 0;
+  width: 100%;
+  overflow: hidden;
   padding: 0 4px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.notification-mini-chart {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.notification-mini-chart-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary-blue);
+  font-size: 11px;
+  margin-bottom: 8px;
 }
 
 .notification-chart-legend {
@@ -545,13 +569,14 @@ main.grid {
 
 .notification-chart-columns {
   display: grid;
-  grid-template-columns: repeat(4, 118px);
-  justify-content: start;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  justify-content: stretch;
   gap: 2px;
   align-items: end;
   height: 190px;
   margin-top: 12px;
-  padding: 0 8px 0;
+  padding: 0 2px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -647,7 +672,17 @@ main.grid {
 
 .notification-details-table th:nth-child(6),
 .notification-details-table td:nth-child(6) {
-  width: 90px;
+  width: 140px;
+  text-align: center;
+}
+
+.notification-details-table th:nth-child(7),
+.notification-details-table td:nth-child(7) {
+  width: 52px;
+  text-align: center;
+}
+
+.notification-details-table th {
   text-align: center;
 }
 
@@ -746,16 +781,35 @@ main.grid {
 
 .export-controls {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 24px;
   color: var(--primary-blue);
   font-size: 13px;
 }
 
+.notification-delete-controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.notification-export-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.notification-export-controls {
+  margin-top: 0;
+}
+
 .export-controls input {
-  width: 150px;
+  width: 150px !important;
+  flex: 0 0 150px;
   padding: 9px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
@@ -1219,6 +1273,8 @@ section.card h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   min-height: 38px;
 }
 
@@ -1226,11 +1282,12 @@ section.card h2 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex: 1 1 220px;
   color: var(--primary-blue);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .retake-option input {
@@ -1920,4 +1977,9 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     justify-content: flex-start;
     flex-wrap: wrap;
   }
+}
+
+.export-controls input[type="month"] {
+  width: 130px !important;
+  flex-basis: 130px;
 }
