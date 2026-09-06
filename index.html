@@ -896,7 +896,7 @@
 
       const payload = { name: candidateName, email: recipient, location, packages };
       sendButton.disabled = true;
-      emailStatus.textContent = 'Sending Assessment...........';
+      emailStatus.textContent = 'Sending assessment. Please wait....';
       emailStatus.className = 'email-status sending';
 
       if (GOOGLE_SCRIPT_URL) {
@@ -907,7 +907,7 @@
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
           });
-          emailStatus.textContent = 'Successfully Sent.';
+          emailStatus.textContent = 'Successfully sent. Please see the history for details.';
           emailStatus.className = 'email-status success';
 
           try {
