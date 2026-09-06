@@ -106,7 +106,7 @@ function buildHtmlBody(candidateName, location, packages) {
 <p>Good Day!</p>
 <p>Please click link/s below to start your assessment.</p>
 <ol>${packageLinks}</ol>
-<h3>Note:</h3>
+<h3 style="margin-top: 24px;">Note:</h3>
 <p>If you have completed your assessment, please click the link below to notify our Test Administrator that you have finished your assessment.</p>
 <p><strong>Notify Test Administrator:</strong> <a href="${escapeAttribute(CANDIDATE_NOTIFICATION_URL)}">Click here</a></p>
 <p>Once notified, our Test Administrator will review your assessment status and proceed with checking your results.</p>
