@@ -2,21 +2,20 @@
 
 ## Color Palette
 
-### Primary Colors
+### Primary Colors (Blue)
 - **Primary Dark Blue**: `#1f4fa3` - Logo, main branding
 - **Primary Blue**: `#203a7a` - Headings, text
 - **Accent Blue**: `#4d7cff` - Links, highlights
 - **Sky Blue**: `#39b8ff` - Button left gradient
-- **Purple**: `#8b5cf6` - Button right gradient, accents
+- **Medium Blue**: `#4d9fe8` - Status, accents
+- **Light Blue**: `#4d7cff` - Secondary accents
 
-### Secondary Colors
-- **Green**: `#8be0a8` - Success, selected states
-- **Green Light**: `#e8fff0` - Success background
-- **Green Border**: `#8be0a8` - Success borders
-- **Purple Light**: `#f3ebff` - Purple background
-- **Purple Border**: `#c6a3ff` - Purple borders
-- **Blue Light**: `#e8f0ff` - Blue background
+### Secondary Colors (All Blue Variations)
+- **Blue**: `#5a8fd8` - Alternative accent
+- **Blue Light**: `#e8f0ff` - Light background
 - **Blue Border**: `#a8c6ff` - Blue borders
+- **Pale Blue**: `#d4e4ff` - Very light background
+- **Pale Blue 2**: `#c7d9f0` - Subtle borders
 
 ### Neutral Colors
 - **White**: `#ffffff` - Cards, buttons, backgrounds

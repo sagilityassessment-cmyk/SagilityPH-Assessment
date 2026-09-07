@@ -6,17 +6,17 @@
   --accent-blue: #4d7cff;
   --sky-blue: #39b8ff;
   
-  /* Purple */
-  --purple: #8b5cf6;
-  --purple-light: #f3ebff;
-  --purple-border: #c6a3ff;
+  /* Blue */
+  --purple: #4d7cff;
+  --purple-light: #e8f0ff;
+  --purple-border: #a8c6ff;
   
-  /* Green */
-  --green: #8be0a8;
-  --green-light: #e8fff0;
-  --pink-light: #fff1f4;
-  --yellow-light: #fff9df;
-  --orange-light: #fff0df;
+  /* Blue */
+  --green: #4d9fe8;
+  --green-light: #e8f0ff;
+  --pink-light: #e8f0ff;
+  --yellow-light: #e8f0ff;
+  --orange-light: #e8f0ff;
   
   /* Blue */
   --blue-light: #e8f0ff;
@@ -31,7 +31,7 @@
   --border-light: #d8e3f0;
   --border-subtle: #cfd9e8;
   --text-dark: #123;
-  --text-secondary: #666;
+  --text-secondary: #5a8fd8;
   --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.06);
   --shadow-medium: 0 8px 20px rgba(0, 0, 0, 0.08);
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -189,7 +189,7 @@ header.top {
 
 .header-credit {
   font-size: 15px !important;
-  color: #4d4c4cfa !important;
+  color: #4d7cff !important;
   font-weight: 400 !important;
 }
 
@@ -277,7 +277,7 @@ section.hero {
 
 .hero-credit {
   font-size: 13px !important;
-  color: #999 !important;
+  color: #8dd3f7 !important;
   font-weight: 400 !important;
   margin-top: 12px !important;
 }
@@ -405,11 +405,11 @@ main.grid {
 }
 
 .weekly-legend-swatch.half-first {
-  background: #135cdb;
+  background: #333;
 }
 
 .weekly-legend-swatch.half-second {
-  background: #00cba1;
+  background: #999;
 }
 
 .weekly-chart-scroll {
@@ -451,19 +451,19 @@ main.grid {
 }
 
 .weekly-week-1 {
-  border-top: 3px solid #135cdb;
+  border-top: 3px solid #333;
 }
 
 .weekly-week-2 {
-  border-top: 3px solid #cc2ed0;
+  border-top: 3px solid #666;
 }
 
 .weekly-week-3 {
-  border-top: 3px solid #00cba1;
+  border-top: 3px solid #999;
 }
 
 .weekly-week-4 {
-  border-top: 3px solid #09163c;
+  border-top: 3px solid #444;
 }
 
 .weekly-chart-card svg {
@@ -493,7 +493,7 @@ main.grid {
 
 .weekly-line {
   fill: none;
-  stroke: #4d9fe8;
+  stroke: #666;
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -501,7 +501,7 @@ main.grid {
 
 .weekly-point {
   fill: #ffffff;
-  stroke: #4d9fe8;
+  stroke: #666;
   stroke-width: 3;
 }
 
@@ -536,10 +536,20 @@ main.grid {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
   color: var(--primary-blue);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
+  cursor: pointer;
+}
+
+.notification-candidate-login:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 .notification-candidate-login:hover {
@@ -738,19 +748,19 @@ main.grid {
 }
 
 .notification-chart-bar.notification-count-0 {
-  background: #8dd3f7;
+  background: #4d7cff;
 }
 
 .notification-chart-bar.notification-count-1 {
-  background: #e78be7;
+  background: #8be0a8;
 }
 
 .notification-chart-bar.notification-count-2 {
-  background: #79e9c5;
+  background: #ffe27a;
 }
 
 .notification-chart-bar.notification-count-3 {
-  background: #ffe27a;
+  background: #8b5cf6;
 }
 
 .notification-chart-swatch.no-status,
@@ -946,10 +956,10 @@ main.grid {
   border-radius: 4px;
 }
 
-.bar-0 { background: #8dd3f7; }
-.bar-1 { background: #e78be7; }
-.bar-2 { background: #79e9c5; }
-.bar-3 { background: #ffe27a; }
+.bar-0 { background: #4d7cff; }
+.bar-1 { background: #8be0a8; }
+.bar-2 { background: #ffe27a; }
+.bar-3 { background: #8b5cf6; }
 .bar-4 { background: #e4d8ff; }
 .bar-5 { background: #ffd9bd; }
 
@@ -2385,49 +2395,49 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 }
 
 .weekly-week-1 .weekly-line {
-  stroke: #135cdb;
+  stroke: #333;
 }
 
 .weekly-week-1 .weekly-point {
-  stroke: #135cdb;
+  stroke: #333;
 }
 
 .weekly-week-2 .weekly-line {
-  stroke: #cc2ed0;
+  stroke: #666;
 }
 
 .weekly-week-2 .weekly-point {
-  stroke: #cc2ed0;
+  stroke: #666;
 }
 
 .weekly-week-3 .weekly-line {
-  stroke: #00cba1;
+  stroke: #999;
 }
 
 .weekly-week-3 .weekly-point {
-  stroke: #00cba1;
+  stroke: #999;
 }
 
 .weekly-week-4 .weekly-line {
-  stroke: #09163c;
+  stroke: #444;
 }
 
 .weekly-week-4 .weekly-point {
-  stroke: #09163c;
+  stroke: #444;
 }
 
 .weekly-line.half-first {
-  stroke: #135cdb;
+  stroke: #333;
 }
 
 .weekly-line.half-second {
-  stroke: #00cba1;
+  stroke: #999;
 }
 
 .weekly-point.half-first {
-  stroke: #135cdb;
+  stroke: #333;
 }
 
 .weekly-point.half-second {
-  stroke: #00cba1;
+  stroke: #999;
 }
