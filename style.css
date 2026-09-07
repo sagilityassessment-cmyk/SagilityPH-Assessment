@@ -2002,9 +2002,15 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     margin-bottom: 7px;
   }
 
+  .category-title svg {
+    width: 13px;
+    height: 13px;
+  }
+
   .package-item {
     grid-template-columns: 16px minmax(0, 1fr);
     gap: 6px;
+    align-items: start;
     min-height: 42px;
     padding: 6px 8px;
   }
@@ -2012,6 +2018,7 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   .package-checkbox {
     width: 14px;
     height: 14px;
+    margin-top: 2px;
   }
 
   .package-name {
@@ -2022,6 +2029,8 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 
   .package-info {
     text-align: left;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .selected-packages-card #selectedPackagesContainer {
