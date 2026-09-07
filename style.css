@@ -1400,6 +1400,9 @@ section.card h2 {
 }
 
 .category-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
   font-weight: 700;
   color: var(--primary-blue);
@@ -1409,6 +1412,12 @@ section.card h2 {
   background: transparent;
   border-radius: 0;
   text-align: left;
+}
+
+.category-title svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
 }
 
 .categories-wrapper {
@@ -2008,6 +2017,11 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   .package-name {
     font-size: 11px;
     line-height: 1.35;
+    text-align: left;
+  }
+
+  .package-info {
+    text-align: left;
   }
 
   .selected-packages-card #selectedPackagesContainer {
