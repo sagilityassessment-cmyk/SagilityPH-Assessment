@@ -1427,38 +1427,55 @@ section.card h2 {
   align-items: start;
 }
 
+.packages-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
 .categories-wrapper > .packages-category {
   border-width: 2px;
   box-shadow: 0 8px 18px rgba(45, 103, 177, 0.08);
 }
 
-.categories-wrapper > .packages-category:nth-child(1) {
+.category-level1 {
   background: linear-gradient(160deg, #f2f8ff 0%, #ffffff 72%);
   border-color: #b9d5f5;
   box-shadow: 0 8px 18px rgba(72, 145, 224, 0.12);
 }
 
-.categories-wrapper > .packages-category:nth-child(2) {
+.category-level3-clinical {
+  background: linear-gradient(160deg, #fffbea 0%, #ffffff 72%);
+  border-color: #ead68a;
+  box-shadow: 0 8px 18px rgba(214, 177, 56, 0.14);
+}
+
+.category-level2 {
   background: linear-gradient(160deg, #f2fff8 0%, #ffffff 72%);
   border-color: #b8e4ca;
   box-shadow: 0 8px 18px rgba(83, 180, 119, 0.12);
 }
 
-.categories-wrapper > .packages-category:nth-child(3) {
+.category-standalone {
   background: linear-gradient(160deg, #faf5ff 0%, #ffffff 72%);
   border-color: #d7baf5;
   box-shadow: 0 8px 18px rgba(139, 92, 246, 0.12);
 }
 
-.categories-wrapper > .packages-category:nth-child(1) .category-title {
+.category-level1 .category-title {
   color: #2768ae;
 }
 
-.categories-wrapper > .packages-category:nth-child(2) .category-title {
+.category-level3-clinical .category-title {
+  color: #987400;
+}
+
+.category-level2 .category-title {
   color: #28784b;
 }
 
-.categories-wrapper > .packages-category:nth-child(3) .category-title {
+.category-standalone .category-title {
   color: #7441a8;
 }
 
@@ -1501,6 +1518,11 @@ section.card h2 {
   border-color: #8bd8a5;
 }
 
+#packagesList-level3-clinical .package-item.checked {
+  background: #fffbe8;
+  border-color: #e8ce73;
+}
+
 #packagesList-standalone .package-item.checked {
   background: #f5ecff;
   border-color: #c8aaf8;
@@ -1512,6 +1534,10 @@ section.card h2 {
 
 #packagesList-level2 .package-checkbox {
   accent-color: #4bb06b;
+}
+
+#packagesList-level3-clinical .package-checkbox {
+  accent-color: #d2ab22;
 }
 
 #packagesList-standalone .package-checkbox {
@@ -2072,7 +2098,37 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   }
   
   .categories-wrapper {
+    display: grid;
     grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .packages-column {
+    display: contents;
+  }
+
+  .category-level1 {
+    grid-column: 1;
+    grid-row: 1;
+    order: 1;
+  }
+
+  .category-level2 {
+    grid-column: 1;
+    grid-row: 2;
+    order: 2;
+  }
+
+  .category-standalone {
+    grid-column: 1;
+    grid-row: 3;
+    order: 3;
+  }
+
+  .category-level3-clinical {
+    grid-column: 1;
+    grid-row: 4;
+    order: 4;
   }
   
   main.grid {

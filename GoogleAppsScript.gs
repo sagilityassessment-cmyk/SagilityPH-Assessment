@@ -22,14 +22,18 @@ function doPost(e) {
     const location = String(request.location || '').trim();
     const packages = Array.isArray(request.packages) ? request.packages : [];
     const isRetake = request.isRetake === true;
+    const isFollowUp = request.isFollowUp === true;
 
     if (!candidateName || !candidateEmail || !location || packages.length === 0) {
       return jsonResponse({ success: false, error: 'Name, email, location, and at least one package are required.' });
     }
 
-    const subject = `${isRetake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_'}${candidateName}_${location}`;
-    const plainTextBody = buildPlainTextBody(candidateName, location, packages, isRetake);
-    const htmlBody = buildHtmlBody(candidateName, location, packages, isRetake);
+    const subjectPrefix = isFollowUp
+      ? 'Sagility Assessment Follow Up_'
+      : isRetake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_';
+    const subject = `${subjectPrefix}${candidateName}_${location}`;
+    const plainTextBody = buildPlainTextBody(candidateName, location, packages, isRetake, isFollowUp);
+    const htmlBody = buildHtmlBody(candidateName, location, packages, isRetake, isFollowUp);
 
     MailApp.sendEmail({
       to: candidateEmail,
@@ -46,9 +50,11 @@ function doPost(e) {
   }
 }
 
-function buildPlainTextBody(candidateName, location, packages, isRetake) {
+function buildPlainTextBody(candidateName, location, packages, isRetake, isFollowUp) {
   const packageLines = packages.map(item => `${item.name} - ${item.url}`).join('\n');
-  const introduction = isRetake
+  const introduction = isFollowUp
+    ? 'Good Day!\n\nI would like to follow up on your assessment completion. Kindly complete the assessments below at your earliest convenience:'
+    : isRetake
     ? 'Sorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.'
     : 'Good Day!\n\nPlease click link/s below to start your assessment.';
 
@@ -99,11 +105,13 @@ Talent Acquisition- Sagility Recruitment - Test Admin
 ${location}`;
 }
 
-function buildHtmlBody(candidateName, location, packages, isRetake) {
+function buildHtmlBody(candidateName, location, packages, isRetake, isFollowUp) {
   const packageLinks = packages.map(item =>
     `<li><strong>${escapeHtml(item.name)}:</strong> <a href="${escapeAttribute(item.url)}">Click here</a></li>`
   ).join('');
-  const introduction = isRetake
+  const introduction = isFollowUp
+    ? '<p>I would like to follow up on your assessment completion. Kindly complete the assessments below at your earliest convenience:</p>'
+    : isRetake
     ? '<p>Sorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.</p>'
     : '<p>Good Day!</p><p>Please click link/s below to start your assessment.</p>';
 

@@ -119,6 +119,10 @@
               <input id="retakeCheckbox" type="checkbox">
               Click here if Retake Assessment
             </label>
+            <label class="retake-option">
+              <input id="followAssessmentCheckbox" type="checkbox">
+              Click here if Follow Assessment
+            </label>
             <button id="sendEmailBtn" class="send-email-btn" type="button">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
@@ -152,8 +156,9 @@
     <p class="packages-subtitle">Select one or more packages for assessment</p>
     
     <div class="categories-wrapper">
+      <div class="packages-column">
       <!-- Level 1 -->
-      <div class="packages-category">
+      <div class="packages-category category-level1">
         <h3 class="category-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m3 7 9-4 9 4-9 4-9-4Z"></path>
@@ -190,8 +195,58 @@
         </div>
       </div>
 
+      <!-- Level 3 Clinical -->
+      <div class="packages-category category-level3-clinical">
+        <h3 class="category-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m3 7 9-4 9 4-9 4-9-4Z"></path>
+            <path d="M3 7v10l9 4 9-4V7"></path>
+            <path d="M12 11v10"></path>
+          </svg>
+          Assessment Level 3 Clinical
+        </h3>
+        <div class="packages-list" id="packagesList-level3-clinical">
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 3: Clinical Assessment (Philippines)" data-color="yellow" data-url="https://journey.harver-us.com/vacancy/67e30e38fdb051af4a24761f">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 3: Clinical Assessment (Philippines)</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 3: Oncology Nurse Clinical Knowledge Test - PHP_RNC2" data-color="yellow" data-url="https://journey.harver-us.com/vacancy/67e86a60f2d06a81c622b875">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 3: Oncology Nurse Clinical Knowledge Test - PHP_RNC2</span>
+            </div>
+          </label>
+
+          <label class="package-item">
+            <input type="checkbox" class="package-checkbox" data-package="Level 3: Labcorp OE Assessment- DATA ENTRY" data-color="yellow" data-url="https://journey.harver-us.com/vacancy/67e30c44fdb051af4a2475f6">
+            <div class="package-checkbox-visual">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="package-info">
+              <span class="package-name">Level 3: Labcorp OE Assessment- DATA ENTRY</span>
+            </div>
+          </label>
+        </div>
+      </div>
+      </div>
+
       <!-- Level 2 -->
-      <div class="packages-category">
+      <div class="packages-category category-level2">
         <h3 class="category-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m3 7 9-4 9 4-9 4-9-4Z"></path>
@@ -277,7 +332,7 @@
       </div>
 
       <!-- Standalone -->
-      <div class="packages-category">
+      <div class="packages-category category-standalone">
         <h3 class="category-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m3 7 9-4 9 4-9 4-9-4Z"></path>
@@ -481,7 +536,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script>
     // Paste your deployed Google Apps Script Web app URL here.
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySwrZkHU1goTZqRCsfw5KGeNOHnoUAeDD8i_wmBfsLM66dewMd1RJFGWE_-IZQPEtBYQ/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBgHVtTwGcI5Wk2261KJicHaYYqcENG3QzYJCnjnIHr9HHilIkMzo28zK3qruMlvZQxQ/exec';
     const firebaseConfig = {
       apiKey: 'AIzaSyBZVAXmgE-24AVUFB_7xS4GQi4OwkIvptQ',
       authDomain: 'sagility-assessment.firebaseapp.com',
@@ -643,16 +698,23 @@
     ================================================================= */
     const packageCatalog = {
       level1: [
-        { name: 'Level 1 Workday (Personality, SJT, Logical, Computer)', url: 'https://journey.harver-us.com/vacancy/680a85c5678d2a49a06c94d3' },
-        { name: 'Level 1 Standalone (Personality, SJT, Logical)', url: 'https://journey.harver-us.com/vacancy/67dc5093f62d0c4018a3e8e9' }
+        { name: 'Level 1: Workday (Personality, SJT, Logical, Computer)', url: 'https://journey.harver-us.com/vacancy/680a85c5678d2a49a06c94d3' },
+        { name: 'Level 1: Standalone (Personality, SJT, Logical)', url: 'https://journey.harver-us.com/vacancy/67dc5093f62d0c4018a3e8e9' }
+      ],
+      'level3-clinical': [
+        { name: 'Level 3: Clinical Acumen', url: 'https://journey.harver-us.com/vacancy/67e30e38fdb051af4a24761f' },
+        { name: 'Level 3: Oncology', url: 'https://journey.harver-us.com/vacancy/67e86a60f2d06a81c622b875' },
+        { name: 'Level 3: Data Entry', url: 'https://journey.harver-us.com/vacancy/67e30c44fdb051af4a2475f6' },
+        { name: 'Level 3: Anatomy', url: 'https://journey.harver-us.com/vacancy/67e73e7af2d06a81c622b807' },
+        { name: 'Level 3: Registered Nurse Test', url: 'https://journey.harver-us.com/vacancy/67e85ab1f2d06a81c622b834' }
       ],
       level2: [
-        { name: 'Level 2 (Spoken B2, English B1)', url: 'https://journey.harver-us.com/vacancy/680f51a8527167ce829a04dc' },
-        { name: 'Level 2 (Spoken B1, English B1)', url: 'https://journey.harver-us.com/vacancy/680fa6ba527167ce829a0660' },
-        { name: 'Level 2 (Spoken B2, English B1, Typing)', url: 'https://journey.harver-us.com/vacancy/680f58fe527167ce829a04f3' },
-        { name: 'Level 2 (Spoken B2, English B2, Typing)', url: 'https://journey.harver-us.com/vacancy/680f7607527167ce829a05bf' },
-        { name: 'Level 2 (Spoken B2, English, Typing, RNT)', url: 'https://journey.harver-us.com/vacancy/680f74a0527167ce829a057a' },
-        { name: 'Level 2 (English, Typing, RNT)', url: 'https://journey.harver-us.com/vacancy/680f7781527167ce829a0628' }
+        { name: 'Level 2: Spoken B2, English B1', url: 'https://journey.harver-us.com/vacancy/680f51a8527167ce829a04dc' },
+        { name: 'Level 2: Spoken B1, English B1', url: 'https://journey.harver-us.com/vacancy/680fa6ba527167ce829a0660' },
+        { name: 'Level 2: Spoken B2, English B1, Typing', url: 'https://journey.harver-us.com/vacancy/680f58fe527167ce829a04f3' },
+        { name: 'Level 2: Spoken B2, English B2, Typing', url: 'https://journey.harver-us.com/vacancy/680f7607527167ce829a05bf' },
+        { name: 'Level 2: Spoken B2, English, Typing, RNT', url: 'https://journey.harver-us.com/vacancy/680f74a0527167ce829a057a' },
+        { name: 'Level 2: English, Typing, RNT', url: 'https://journey.harver-us.com/vacancy/680f7781527167ce829a0628' }
       ],
       standalone: [
         { name: 'Spoken Language Proficiency - B1/B2', url: 'https://journey.harver-us.com/vacancy/67e314c6fdb051af4a247646' },
@@ -660,19 +722,44 @@
         { name: 'English Language Proficiency', url: 'https://journey.harver-us.com/vacancy/67e85fd6f2d06a81c622b861' },
         { name: 'Typing Assessment', url: 'https://journey.harver-us.com/vacancy/67e86c60f2d06a81c622b88e' },
         { name: 'Basic Computer Proficiency Test', url: 'https://journey.harver-us.com/vacancy/67e9eb45f2d06a81c622b8a3' },
-        { name: 'Spanish Bilingual', url: 'https://journey.harver-us.com/vacancy/6a060301154605ed880b0d35' },
-        { name: 'PHP AnatomyPhysio', url: 'https://journey.harver-us.com/vacancy/67e73e7af2d06a81c622b807' },
-        { name: 'Registered Nurse Test (Philippines)', url: 'https://journey.harver-us.com/vacancy/67e85ab1f2d06a81c622b834' }
-      ]
+        { name: 'Spanish Bilingual', url: 'https://journey.harver-us.com/vacancy/6a060301154605ed880b0d35' }
+      ],
     };
 
+    function createPackageItem() {
+      const packageItem = document.createElement('label');
+      packageItem.className = 'package-item';
+      packageItem.innerHTML = `
+        <input type="checkbox" class="package-checkbox">
+        <div class="package-checkbox-visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="package-info">
+          <span class="package-name"></span>
+        </div>
+      `;
+      return packageItem;
+    }
+
     function applyPackageCatalog() {
+      const colorByCategory = {
+        level1: 'blue',
+        'level3-clinical': 'yellow',
+        level2: 'green',
+        standalone: 'purple'
+      };
+
       Object.entries(packageCatalog).forEach(([category, packages]) => {
         const list = document.getElementById(`packagesList-${category}`);
-        list.querySelectorAll('.package-checkbox').forEach((checkbox, index) => {
-          const packageDetails = packages[index];
-          if (!packageDetails) return;
+        list.innerHTML = '';
+        packages.forEach((packageDetails, index) => {
+          list.appendChild(createPackageItem());
+          const checkbox = list.querySelectorAll('.package-checkbox')[index];
+
           checkbox.dataset.package = packageDetails.name;
+          checkbox.dataset.color = colorByCategory[category] || 'blue';
           checkbox.dataset.url = packageDetails.url;
           const packageName = checkbox.closest('.package-item').querySelector('.package-name');
           packageName.textContent = packageDetails.name;
@@ -698,6 +785,7 @@
         const listId = checkbox.closest('.packages-list').id;
         const colorByCategory = {
           'packagesList-level1': 'blue',
+          'packagesList-level3-clinical': 'yellow',
           'packagesList-level2': 'green',
           'packagesList-standalone': 'purple'
         };
@@ -1198,6 +1286,7 @@
       const recipient = document.getElementById('emailInput').value.trim();
       const location = document.getElementById('locationInput').value.trim();
       const isRetake = document.getElementById('retakeCheckbox').checked;
+      const isFollowUp = document.getElementById('followAssessmentCheckbox').checked;
       const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')];
       const packages = selectedPackages.map(checkbox => ({
         name: checkbox.dataset.package,
@@ -1211,7 +1300,7 @@
         return;
       }
 
-      const payload = { name: candidateName, email: recipient, location, packages, isRetake };
+      const payload = { name: candidateName, email: recipient, location, packages, isRetake, isFollowUp };
       sendButton.disabled = true;
       emailStatus.textContent = 'Sending Assessment...........';
       emailStatus.className = 'email-status sending';
@@ -1246,8 +1335,13 @@
       const packageLinks = packages.map((item, index) =>
         `Package ${index + 1} - ${item.name}: ${item.url}`
       );
-      const subject = `${isRetake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_'}${candidateName}_${location}`;
-      const intro = isRetake
+      const subjectPrefix = isFollowUp
+        ? 'Sagility Assessment Follow Up_'
+        : isRetake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_';
+      const subject = `${subjectPrefix}${candidateName}_${location}`;
+      const intro = isFollowUp
+        ? `Hi ${candidateName},\n\nGood Day!\n\nI would like to follow up on your assessment completion. Kindly complete the assessments below at your earliest convenience.`
+        : isRetake
         ? `Hi ${candidateName},\n\nSorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.\n\nPlease click link/s below to start your assessment.`
         : `Hi ${candidateName},\n\nGood Day!\n\nPlease click link/s below to start your assessment.`;
       const body = `${intro}\n\n${packageLinks.join('\n')}\n\nBefore You Start:\n\n• We recommend using a Laptop/PC and a headset.\n• Make sure you are in a quiet environment.\n• Use your active email address and enter the security code when prompted.\n• Read all instructions carefully before taking the assessment.\n\nNeed Assistance?\n\nIf you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.\n\nTime: 11am-8pm MNL\nLink: Meeting Invite\nMeeting ID: 479 656 747 406 7\nPasscode: vi3nV3NB\n\nImportant Reminders:\n\n⚠️ Use the assessment link only once.\n🔒 Do not share or forward the link.\n📍 The system records IP address and location.\n📇 Assessment materials are confidential. Any misuse may affect your application.\n\nFor questions or assistance, please contact:\nPHLTestAdmin@Sagilityhealth.com\n\nThank you, and good luck with your assessment!\n\nBest Regards,\n\nTalent Acquisition- Sagility Recruitment - Test Admin\n${location}`;
@@ -1263,6 +1357,7 @@
       document.getElementById('emailInput').value = '';
       document.getElementById('locationInput').selectedIndex = 0;
       document.getElementById('retakeCheckbox').checked = false;
+      document.getElementById('followAssessmentCheckbox').checked = false;
       document.querySelectorAll('.package-checkbox').forEach(checkbox => {
         checkbox.checked = false;
         updatePackageItemUI(checkbox);
