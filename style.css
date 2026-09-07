@@ -2015,10 +2015,16 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     padding: 6px 8px;
   }
 
-  .package-checkbox {
-    width: 14px;
-    height: 14px;
-    margin-top: 2px;
+  .card .package-checkbox {
+    display: block;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px;
+    max-width: 14px;
+    margin: 2px 0 0;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 0;
   }
 
   .package-name {
