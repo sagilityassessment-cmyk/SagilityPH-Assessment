@@ -1545,7 +1545,7 @@ section.card h2 {
   gap: 2px;
   min-width: 0;
   width: 100%;
-  text-align: center;
+  text-align: left;
 }
 
 .package-name {
@@ -1554,6 +1554,7 @@ section.card h2 {
   font-weight: 600;
   color: var(--primary-blue);
   line-height: 1.45;
+  text-align: left;
   overflow-wrap: anywhere;
   white-space: normal;
 }
