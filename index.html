@@ -610,7 +610,7 @@
     }
 
     function persistState() {
-      const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')].map(checkbox => ({
+      const selectedPackages = getOrderedSelectedPackageCheckboxes().map(checkbox => ({
         package: checkbox.dataset.package,
         url: checkbox.dataset.url
       }));
@@ -774,9 +774,24 @@
       updateSelectedPackages();
     }
 
+    function getOrderedSelectedPackageCheckboxes() {
+      const categoryOrder = {
+        'packagesList-level1': 1,
+        'packagesList-level2': 2,
+        'packagesList-level3-clinical': 3,
+        'packagesList-standalone': 4
+      };
+
+      return [...document.querySelectorAll('.package-checkbox:checked')].sort((first, second) => {
+        const firstListId = first.closest('.packages-list').id;
+        const secondListId = second.closest('.packages-list').id;
+        return categoryOrder[firstListId] - categoryOrder[secondListId];
+      });
+    }
+
     // Update selected packages display
     function updateSelectedPackages() {
-      const checkboxes = document.querySelectorAll('.package-checkbox:checked');
+      const checkboxes = getOrderedSelectedPackageCheckboxes();
       const container = document.getElementById('selectedPackagesContainer');
       container.innerHTML = '';
 
@@ -1287,7 +1302,7 @@
       const location = document.getElementById('locationInput').value.trim();
       const isRetake = document.getElementById('retakeCheckbox').checked;
       const isFollowUp = document.getElementById('followAssessmentCheckbox').checked;
-      const selectedPackages = [...document.querySelectorAll('.package-checkbox:checked')];
+      const selectedPackages = getOrderedSelectedPackageCheckboxes();
       const packages = selectedPackages.map(checkbox => ({
         name: checkbox.dataset.package,
         url: checkbox.dataset.url
