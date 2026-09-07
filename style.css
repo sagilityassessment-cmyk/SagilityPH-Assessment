@@ -361,7 +361,7 @@ main.grid {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-dark);
+  color: var(--primary-blue);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -1751,8 +1751,8 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 
   .notification-report-actions {
     position: static;
-    align-items: flex-end;
-    order: 3;
+    align-items: flex-start;
+    order: 0;
     margin-top: 4px;
   }
 
@@ -1783,6 +1783,20 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 
   .notification-export-controls {
     order: 2;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: stretch;
+    gap: 8px;
+  }
+
+  .notification-export-controls input {
+    width: 100% !important;
+    flex: none;
+  }
+
+  .notification-export-controls .export-status {
+    grid-column: 1 / -1;
   }
 
   .notification-report-actions {
