@@ -194,10 +194,10 @@ header.top {
 }
 
 nav {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  align-items: stretch;
+  width: 270px;
   flex-shrink: 0;
 }
 
@@ -207,12 +207,12 @@ nav a {
   gap: 6px;
   color: var(--text-dark);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 6px 8px;
   border: 1px solid rgba(77, 124, 255, 0.28);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.72);
@@ -228,14 +228,37 @@ nav a[href="#notificationReport"] {
 }
 
 nav a svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   flex: 0 0 auto;
 }
 
 nav a:hover {
   color: var(--accent-blue);
   background: var(--bg-hover);
+}
+
+.header-location-select {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(77, 124, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-dark);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header-location-select:focus {
+  outline: 2px solid rgba(77, 124, 255, 0.45);
+  outline-offset: 1px;
+}
+
+.header-location-select:invalid {
+  color: #8a969e;
 }
 
 /* ===== HERO SECTION ===== */
@@ -1865,12 +1888,13 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   }
   
   nav {
-    gap: 16px;
+    gap: 6px;
+    width: 230px;
   }
   
   nav a {
-    font-size: 12px;
-    padding: 5px 10px;
+    font-size: 10px;
+    padding: 5px 6px;
   }
   
   .hero-content {
@@ -1924,12 +1948,13 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   }
   
   nav {
-    gap: 12px;
+    gap: 6px;
+    width: 220px;
   }
   
   nav a {
     font-size: 11px;
-    padding: 5px 10px;
+    padding: 5px 6px;
   }
   
   main.grid {
@@ -2153,16 +2178,13 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   
   nav {
     width: 100%;
-    flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
-    gap: 26px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
   
   nav a {
-    font-size: 11px;
+    font-size: 10px;
     min-width: 0;
-    flex: 1 1 0;
     padding: 6px 8px;
   }
   

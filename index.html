@@ -45,8 +45,37 @@
       <p class="header-credit">Created by Richiel Caña</p>
     </div>
     <nav>
-      <a href="#reports">Reports</a>
-      <a href="#notificationReport">Candidates Report Status</a>
+      <a href="#reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M4 19V5"></path>
+          <path d="M4 19h16"></path>
+          <path d="m7 15 3-4 3 2 5-6"></path>
+        </svg>
+        Reports
+      </a>
+      <a href="#notificationReport">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        Candidates Status
+      </a>
+      <a href="candidate.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Candidate Login
+      </a>
+      <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
+        <option value="" disabled hidden selected>Location</option>
+        <option value="Iloilo City">Iloilo City</option>
+        <option value="Bohol">Bohol</option>
+        <option value="Alabang">Alabang</option>
+        <option value="Quezon City">Quezon City</option>
+      </select>
     </nav>
   </header>
 
@@ -493,13 +522,6 @@
         <p class="packages-subtitle">Candidate completion status by location</p>
       </div>
       <div class="notification-report-actions">
-        <a class="notification-candidate-login" href="candidate.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          Candidate Login
-        </a>
       </div>
     </div>
     <div class="notification-report-overview">
@@ -550,6 +572,26 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script>
+    const headerLocationSelect = document.getElementById('headerLocationSelect');
+    const locationInput = document.getElementById('locationInput');
+    const LOCATION_STORAGE_KEY = 'sagility-selected-location';
+    const savedLocation = localStorage.getItem(LOCATION_STORAGE_KEY) || '';
+    headerLocationSelect.value = savedLocation;
+    locationInput.value = savedLocation;
+
+    headerLocationSelect.addEventListener('change', () => {
+      localStorage.setItem(LOCATION_STORAGE_KEY, headerLocationSelect.value);
+      locationInput.value = headerLocationSelect.value;
+      locationInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    locationInput.addEventListener('change', () => {
+      headerLocationSelect.value = locationInput.value;
+      if (locationInput.value) {
+        localStorage.setItem(LOCATION_STORAGE_KEY, locationInput.value);
+      }
+    });
+
     // Paste your deployed Google Apps Script Web app URL here.
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBgHVtTwGcI5Wk2261KJicHaYYqcENG3QzYJCnjnIHr9HHilIkMzo28zK3qruMlvZQxQ/exec';
     const firebaseConfig = {
@@ -581,6 +623,9 @@
     const HISTORY_DELETE_KEY = 'sagility-assessment-hidden-history';
     const chimeAudio = new Audio('chime.mp3');
     chimeAudio.preload = 'auto';
+    let notificationAudioUnlocked = false;
+    const notificationQueue = [];
+    let isNotificationQueueRunning = false;
     let sentHistoryRecords = [];
     let previousRecordIds = new Set();
     let hasLoadedHistory = false;
@@ -604,28 +649,105 @@
       });
     }
 
-    function speakNotification(message) {
-      // Check if browser supports speech synthesis
-      if (!('speechSynthesis' in window)) {
-        console.log('Speech synthesis not supported');
+    function unlockNotificationAudio() {
+      if (notificationAudioUnlocked) {
         return;
       }
-      
-      // Cancel any previous speech
-      window.speechSynthesis.cancel();
-      
+
+      chimeAudio.muted = true;
+      chimeAudio.play()
+        .then(() => {
+          chimeAudio.pause();
+          chimeAudio.currentTime = 0;
+          chimeAudio.muted = false;
+          notificationAudioUnlocked = true;
+        })
+        .catch(() => {
+          chimeAudio.muted = false;
+        });
+    }
+
+    document.addEventListener('pointerdown', unlockNotificationAudio, { once: true });
+    document.addEventListener('keydown', unlockNotificationAudio, { once: true });
+
+    function speakNextNotification() {
+      if (notificationQueue.length === 0) {
+        isNotificationQueueRunning = false;
+        return;
+      }
+
+      const message = notificationQueue.shift();
+      if (!('speechSynthesis' in window)) {
+        speakNextNotification();
+        return;
+      }
+
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.rate = 1;
       utterance.pitch = 1;
       utterance.volume = 1;
-      
+      utterance.onend = speakNextNotification;
+      utterance.onerror = speakNextNotification;
       window.speechSynthesis.speak(utterance);
     }
 
-    async function triggerAssessmentNotification(firstName, location) {
-      await playChime();
-      speakNotification(`Done Assessment ${firstName} from ${location}`);
+    function queueNotification(message, location) {
+      if (!headerLocationSelect.value || headerLocationSelect.value !== location) {
+        return;
+      }
+
+      notificationQueue.push(message);
+
+      if (isNotificationQueueRunning) {
+        return;
+      }
+
+      isNotificationQueueRunning = true;
+      playChime().then(speakNextNotification);
     }
+
+    function triggerAssessmentNotification(firstName, location) {
+      queueNotification(`Done Assessment ${firstName} from ${location}`, location);
+    }
+
+    function initializeAssessmentAudioNotifications() {
+      ensureFirebaseAuth()
+        .then(() => {
+          let hasLoadedAudioNotifications = false;
+
+          firestore.collection('notificationHistory')
+            .where('expiresAt', '>', Date.now())
+            .orderBy('expiresAt', 'asc')
+            .onSnapshot(snapshot => {
+              if (!hasLoadedAudioNotifications) {
+                hasLoadedAudioNotifications = true;
+                return;
+              }
+
+              snapshot.docChanges()
+                .filter(change => change.type === 'added')
+                .forEach(change => {
+                  const notification = change.doc.data();
+                  if (notification.source !== 'assessment-audio') {
+                    return;
+                  }
+                  if (Number(notification.expiresAt) <= Date.now()) {
+                    return;
+                  }
+                  queueNotification(
+                    `${notification.action} ${notification.seat}`,
+                    notification.location
+                  );
+                });
+            }, error => {
+              console.error('Assessment audio notifications unavailable:', error);
+            });
+        })
+        .catch(error => {
+          console.error('Assessment audio authentication failed:', error);
+        });
+    }
+
     let notificationRecords = [];
     const pendingNotificationStatuses = new Map();
 
@@ -1524,6 +1646,12 @@
         url: checkbox.dataset.url
       }));
 
+      if (!headerLocationSelect.value) {
+        headerLocationSelect.focus();
+        alert('Please choose a location first.');
+        return;
+      }
+
       if (!candidateName || !recipient || !location || packages.length === 0) {
         emailStatus.textContent = '';
         emailStatus.className = 'email-status';
@@ -1587,6 +1715,8 @@
       document.getElementById('candidateNameInput').value = '';
       document.getElementById('emailInput').value = '';
       document.getElementById('locationInput').selectedIndex = 0;
+      headerLocationSelect.value = '';
+      localStorage.removeItem(LOCATION_STORAGE_KEY);
       document.getElementById('retakeCheckbox').checked = false;
       document.getElementById('followAssessmentCheckbox').checked = false;
       document.querySelectorAll('.package-checkbox').forEach(checkbox => {
@@ -1615,6 +1745,7 @@
       restoreState();
       renderReports();
       initializeFirebaseHistory();
+      initializeAssessmentAudioNotifications();
     });
   </script>
 </body>
