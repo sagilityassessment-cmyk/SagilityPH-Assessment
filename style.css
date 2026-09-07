@@ -195,8 +195,9 @@ header.top {
 
 nav {
   display: flex;
-  gap: 20px;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
   flex-shrink: 0;
 }
 
@@ -210,9 +211,20 @@ nav a {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  padding: 6px 12px;
-  border-radius: 6px;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid rgba(77, 124, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
   white-space: nowrap;
+}
+
+nav a[href="#reports"] {
+  background: #d8eeff;
+}
+
+nav a[href="#notificationReport"] {
+  background: #d8eeff;
 }
 
 nav a svg {
@@ -328,6 +340,169 @@ main.grid {
   width: calc(100% - 48px);
   max-width: 1424px;
   scroll-margin-top: 150px;
+}
+
+.weekly-report-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.weekly-report-month {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary-blue);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.weekly-report-month input {
+  width: 142px;
+  padding: 8px 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+  color: var(--primary-blue);
+  background: var(--bg-white);
+}
+
+.weekly-report-chart {
+  margin-top: 8px;
+  margin-right: -28px;
+  margin-left: -28px;
+  min-width: 0;
+}
+
+.weekly-chart-title {
+  margin: 2px 0 8px;
+  padding-left: 28px;
+  color: var(--primary-blue);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.weekly-legend {
+  display: flex;
+  gap: 18px;
+  margin: 0 0 8px;
+  padding-left: 28px;
+  color: var(--primary-blue);
+  font-size: 12px;
+}
+
+.weekly-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.weekly-legend-swatch {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.weekly-legend-swatch.half-first {
+  background: #135cdb;
+}
+
+.weekly-legend-swatch.half-second {
+  background: #00cba1;
+}
+
+.weekly-chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.weekly-chart-scroll svg {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 220px;
+}
+
+.weekly-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.weekly-chart-card {
+  min-width: 0;
+  padding: 8px 10px 6px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.weekly-chart-card h3 {
+  margin: 0 0 4px;
+  color: var(--primary-blue);
+  font-size: 13px;
+}
+
+.weekly-chart-card h3 span {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.weekly-week-1 {
+  border-top: 3px solid #135cdb;
+}
+
+.weekly-week-2 {
+  border-top: 3px solid #cc2ed0;
+}
+
+.weekly-week-3 {
+  border-top: 3px solid #00cba1;
+}
+
+.weekly-week-4 {
+  border-top: 3px solid #09163c;
+}
+
+.weekly-chart-card svg {
+  display: block;
+  width: 100%;
+  height: 180px;
+  overflow: visible;
+}
+
+.weekly-grid-line {
+  stroke: #dce7f3;
+  stroke-width: 1;
+}
+
+.weekly-axis-label,
+.weekly-day-label,
+.weekly-week-label {
+  fill: var(--primary-blue);
+  font-size: 12px;
+}
+
+.weekly-week-label {
+  fill: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.weekly-line {
+  fill: none;
+  stroke: #4d9fe8;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.weekly-point {
+  fill: #ffffff;
+  stroke: #4d9fe8;
+  stroke-width: 3;
 }
 
 .notification-report-section {
@@ -562,6 +737,22 @@ main.grid {
   background: #4d9fe8;
 }
 
+.notification-chart-bar.notification-count-0 {
+  background: #8dd3f7;
+}
+
+.notification-chart-bar.notification-count-1 {
+  background: #e78be7;
+}
+
+.notification-chart-bar.notification-count-2 {
+  background: #79e9c5;
+}
+
+.notification-chart-bar.notification-count-3 {
+  background: #ffe27a;
+}
+
 .notification-chart-swatch.no-status,
 .notification-chart-bar.no-status {
   background: #c68be8;
@@ -589,6 +780,7 @@ main.grid {
   gap: 6px;
   color: var(--primary-blue);
   font-size: 10px;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -754,12 +946,12 @@ main.grid {
   border-radius: 4px;
 }
 
-.bar-0 { background: #79c6e4; }
-.bar-1 { background: #82df86; }
-.bar-2 { background: #f3a4b7; }
-.bar-3 { background: #f5df80; }
-.bar-4 { background: #c2a4ed; }
-.bar-5 { background: #f2b27b; }
+.bar-0 { background: #8dd3f7; }
+.bar-1 { background: #e78be7; }
+.bar-2 { background: #79e9c5; }
+.bar-3 { background: #ffe27a; }
+.bar-4 { background: #e4d8ff; }
+.bar-5 { background: #ffd9bd; }
 
 .report-empty {
   margin: 0;
@@ -1953,12 +2145,15 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     width: 100%;
     flex-direction: row;
     justify-content: center;
-    gap: 10px;
+    align-items: stretch;
+    gap: 26px;
   }
   
   nav a {
     font-size: 11px;
-    padding: 4px 8px;
+    min-width: 0;
+    flex: 1 1 0;
+    padding: 6px 8px;
   }
   
   section.hero {
@@ -2144,6 +2339,35 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     margin: 0 16px 24px;
   }
 
+  .weekly-report-heading {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .weekly-report-month {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .weekly-report-month input {
+    flex: 1;
+    max-width: 180px;
+  }
+
+  .weekly-chart-title,
+  .weekly-legend {
+    padding-left: 20px;
+  }
+
+  .weekly-report-chart {
+    margin-right: -20px;
+    margin-left: -20px;
+  }
+
+  .weekly-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
   .reports-content {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -2158,4 +2382,52 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 .export-controls input[type="month"] {
   width: 130px !important;
   flex-basis: 130px;
+}
+
+.weekly-week-1 .weekly-line {
+  stroke: #135cdb;
+}
+
+.weekly-week-1 .weekly-point {
+  stroke: #135cdb;
+}
+
+.weekly-week-2 .weekly-line {
+  stroke: #cc2ed0;
+}
+
+.weekly-week-2 .weekly-point {
+  stroke: #cc2ed0;
+}
+
+.weekly-week-3 .weekly-line {
+  stroke: #00cba1;
+}
+
+.weekly-week-3 .weekly-point {
+  stroke: #00cba1;
+}
+
+.weekly-week-4 .weekly-line {
+  stroke: #09163c;
+}
+
+.weekly-week-4 .weekly-point {
+  stroke: #09163c;
+}
+
+.weekly-line.half-first {
+  stroke: #135cdb;
+}
+
+.weekly-line.half-second {
+  stroke: #00cba1;
+}
+
+.weekly-point.half-first {
+  stroke: #135cdb;
+}
+
+.weekly-point.half-second {
+  stroke: #00cba1;
 }

@@ -46,6 +46,7 @@
     </div>
     <nav>
       <a href="#reports">Reports</a>
+      <a href="#notificationReport">Candidates Report Status</a>
     </nav>
   </header>
 
@@ -471,6 +472,20 @@
     </div>
   </section>
 
+  <section id="weeklyReport" class="card reports-section weekly-report-section">
+    <div class="weekly-report-heading">
+      <div>
+        <h2>Weekly Assessment Count</h2>
+        <p class="packages-subtitle">Assessment count for days 1-15 and 16 through month end</p>
+      </div>
+      <label class="weekly-report-month">
+        Month
+        <input id="weeklyReportMonthInput" type="month">
+      </label>
+    </div>
+    <div id="weeklyReportChart" class="weekly-report-chart" aria-label="Weekly assessment count line graph"></div>
+  </section>
+
   <section id="notificationReport" class="card reports-section notification-report-section">
     <div class="notification-report-heading">
       <div>
@@ -852,6 +867,82 @@
         });
     }
 
+    function getWeeklyReportMonth() {
+      const input = document.getElementById('weeklyReportMonthInput');
+      if (input?.value) return input.value;
+      return getManilaDateKey().slice(0, 7);
+    }
+
+    function getMonthlyAssessmentData(monthValue) {
+      const [year, month] = monthValue.split('-').map(Number);
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const emailByDate = new Map();
+
+      getVisibleHistoryRecords().forEach(item => {
+        const dateKey = getRecordDateKey(item);
+        if (!dateKey.startsWith(monthValue)) return;
+        const email = String(item.email || '').trim().toLowerCase();
+        if (!email) return;
+        if (!emailByDate.has(dateKey)) emailByDate.set(dateKey, new Set());
+        emailByDate.get(dateKey).add(email);
+      });
+
+      const days = [];
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const date = new Date(year, month - 1, day);
+        const dateKey = `${monthValue}-${String(day).padStart(2, '0')}`;
+        const dayLabels = ['Sun', 'M', 'T', 'W', 'Th', 'F', 'Sat'];
+        days.push({
+          dayNumber: day,
+          dayLabel: dayLabels[date.getDay()],
+          count: emailByDate.get(dateKey)?.size || 0
+        });
+      }
+      return { days, firstHalf: days.slice(0, 15), secondHalf: days.slice(15) };
+    }
+
+    function renderWeeklyAssessmentChart() {
+      const chart = document.getElementById('weeklyReportChart');
+      if (!chart) return;
+      const monthValue = getWeeklyReportMonth();
+      const [year, month] = monthValue.split('-').map(Number);
+      const monthLabel = new Date(year, month - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const monthlyData = getMonthlyAssessmentData(monthValue);
+      const { days, firstHalf, secondHalf } = monthlyData;
+
+      if (!days.length) {
+        chart.innerHTML = `<p class="report-empty">No assessment data for ${escapeHtml(monthLabel)}</p>`;
+        return;
+      }
+
+      const width = 1400;
+      const height = 220;
+      const sideGap = width * 0.05;
+      const left = sideGap;
+      const right = sideGap;
+      const top = 20;
+      const bottom = 52;
+      const plotWidth = width - left - right;
+      const plotHeight = height - top - bottom;
+      const maxCount = Math.max(...days.map(day => day.count), 1);
+      const xStep = days.length > 1 ? plotWidth / (days.length - 1) : plotWidth;
+      const points = days.map((day, index) => ({
+          ...day,
+          x: left + index * xStep,
+          y: top + plotHeight - (day.count / maxCount) * plotHeight
+        }));
+      const gridLines = [0, 0.5, 1].map(ratio => {
+        const y = top + plotHeight - ratio * plotHeight;
+        const value = Math.round(maxCount * ratio);
+        return `<line x1="${left}" y1="${y}" x2="${width - right}" y2="${y}" class="weekly-grid-line"></line><text x="${left - 8}" y="${y + 4}" class="weekly-axis-label" text-anchor="end">${value}</text>`;
+      }).join('');
+      const labels = points.map(point => `<text x="${point.x}" y="${height - 24}" class="weekly-day-label" text-anchor="middle">${point.dayLabel} ${point.dayNumber}</text>`).join('');
+      const firstPoints = points.slice(0, firstHalf.length).map(point => `${point.x},${point.y}`).join(' ');
+      const secondPoints = points.slice(firstHalf.length).map(point => `${point.x},${point.y}`).join(' ');
+      const dots = points.map((point, index) => `<circle cx="${point.x}" cy="${point.y}" r="4" class="weekly-point ${index < firstHalf.length ? 'half-first' : 'half-second'}"><title>${point.dayLabel} ${point.dayNumber}: ${point.count}</title></circle>`).join('');
+      chart.innerHTML = `<div class="weekly-chart-title">${escapeHtml(monthLabel)}</div><div class="weekly-legend"><span><i class="weekly-legend-swatch half-first"></i>Days 1-15</span><span><i class="weekly-legend-swatch half-second"></i>Days 16-${days.length}</span></div><div class="weekly-chart-scroll"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(monthLabel)} assessment count"><g>${gridLines}</g><polyline points="${firstPoints}" class="weekly-line half-first"></polyline><polyline points="${secondPoints}" class="weekly-line half-second"></polyline>${dots}${labels}</svg></div>`;
+    }
+
     function updateDeleteSelectedButtonState() {
       const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
       const count = document.querySelectorAll('.history-select-checkbox:checked').length;
@@ -1012,12 +1103,12 @@
               <i class="notification-chart-swatch ${type}"></i>${title}
             </div>
             <div class="notification-chart-columns">
-              ${locations.map(location => `
+              ${locations.map((location, index) => `
                 <div class="notification-chart-location">
                   <div class="notification-chart-bars">
                     <div class="notification-chart-bar-wrap" title="${escapeHtml(location)} ${title}: ${values[location]}">
                       <strong>${values[location]}</strong>
-                      <div class="notification-chart-bar ${type}" style="height: ${(values[location] / maxNotificationValue) * 100}%"></div>
+                      <div class="notification-chart-bar ${type} ${type === 'count' ? `notification-count-${index}` : ''}" style="height: ${(values[location] / maxNotificationValue) * 100}%"></div>
                     </div>
                   </div>
                   <span>${escapeHtml(location)}</span>
@@ -1030,6 +1121,7 @@
       }
       const totalCountElement = document.getElementById('reportTotalCount');
       if (totalCountElement) totalCountElement.textContent = totalCount;
+      renderWeeklyAssessmentChart();
       const chart = document.getElementById('reportChart');
       if (!chart) return;
       chart.innerHTML = locations.length
@@ -1184,6 +1276,7 @@
 
     document.getElementById('notificationSearchInput').addEventListener('input', renderReports);
     document.getElementById('notificationSearchBtn').addEventListener('click', renderReports);
+    document.getElementById('weeklyReportMonthInput').addEventListener('change', renderWeeklyAssessmentChart);
 
     document.getElementById('exportDataBtn').addEventListener('click', () => exportHistoryCsv('day'));
     document.getElementById('exportMonthBtn').addEventListener('click', () => exportHistoryCsv('month'));
@@ -1390,6 +1483,12 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
+      const notificationReport = document.getElementById('notificationReport');
+      const reports = document.getElementById('reports');
+      const weeklyReport = document.getElementById('weeklyReport');
+      notificationReport.after(reports);
+      reports.after(weeklyReport);
+      document.getElementById('weeklyReportMonthInput').value = getManilaDateKey().slice(0, 7);
       restoreState();
       renderReports();
       initializeFirebaseHistory();
