@@ -98,7 +98,7 @@
       left: 0;
       right: 0;
       z-index: 10;
-      padding: 12px 20px 18px;
+      padding: 12px 20px 4px;
       text-align: center;
       background:
         linear-gradient(135deg, rgba(210, 250, 220, .34) 0 24%, transparent 24% 58%, rgba(147, 214, 165, .14) 58% 76%, transparent 76%),
@@ -114,6 +114,7 @@
     main {
       position: relative;
       z-index: 1;
+      padding-top: 24px;
     }
 
     .logo {
@@ -136,22 +137,36 @@
       display: flex;
       justify-content: center;
       gap: 16px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
+      width: min(100%, 980px);
+      margin: 0 auto;
+    }
+
+    .level-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex: 0 1 auto;
+      min-width: 0;
+      white-space: nowrap;
     }
 
     .instruction-button {
       display: inline-flex;
       align-items: center;
-      min-height: 48px;
+      height: 28px;
+      min-height: 28px;
       border: 0;
       border-radius: 4px;
-      padding: 10px 18px;
+      padding: 3px 12px;
       color: #fff;
       background: var(--navy);
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
+      flex: 0 1 auto;
+      min-width: 0;
     }
 
     .instruction-button:hover {
@@ -180,6 +195,10 @@
 
     .instruction-actions .completion-panel {
       margin: 0;
+      flex: 0 1 auto;
+      min-width: 0;
+      width: fit-content;
+      flex-basis: 100%;
     }
 
     .completion-panel {
@@ -187,12 +206,13 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      width: fit-content;
+      width: 100%;
+      min-width: 0;
       margin: 12px auto 0;
-      padding: 8px 10px;
-      border: 1px solid rgba(92, 108, 118, .45);
-      border-radius: 6px;
-      background: rgba(226, 231, 234, .72);
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
     }
 
     .completion-panel label {
@@ -206,25 +226,42 @@
 
     .completion-panel select,
     .done-assessment-button {
-      min-height: 32px;
-      padding: 6px 10px;
+      min-height: 28px;
+      padding: 4px 8px;
       border: 1px solid #9aa6ad;
       border-radius: 4px;
       font: inherit;
     }
 
     .completion-panel select {
-      width: 130px;
+      width: 110px;
+      min-width: 0;
       background: #fff;
       color: #26343c;
       font-size: 13px;
       font-weight: 600;
     }
 
+    .location-seat-stack {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .location-seat-stack label {
+      display: block;
+      margin: 0;
+      line-height: 0;
+    }
+
     .done-assessment-button {
+      height: 28px;
+      min-width: 0;
       background: #68747b;
       color: #fff;
-      font-size: 13px;
+      font-size: 10px;
+      line-height: 1;
       font-weight: 700;
       cursor: pointer;
     }
@@ -234,14 +271,17 @@
     }
 
     .assistance-button {
-      min-height: 32px;
-      padding: 6px 10px;
+      min-width: 0;
+      height: 28px;
+      min-height: 28px;
+      padding: 4px 8px;
       border: 1px solid #9aa6ad;
       border-radius: 4px;
       background: #d7dde1;
       color: #34434d;
       font: inherit;
-      font-size: 13px;
+      font-size: 10px;
+      line-height: 1;
       font-weight: 700;
       cursor: pointer;
     }
@@ -250,18 +290,40 @@
       background: #c1cbd1;
     }
 
+    .instruction-button,
+    .done-assessment-button,
+    .assistance-button,
+    .completion-panel select {
+      width: clamp(110px, 18vw, 180px);
+      height: 36px;
+      min-height: 36px;
+      box-sizing: border-box;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .completion-panel select {
+      text-align: center;
+    }
+
     .document-viewer {
       display: grid;
       gap: 18px;
-      width: min(100%, 900px);
+      justify-items: center;
+      width: min(calc(100% - 24px), 900px);
       margin: 18px auto 0;
       padding: 0 12px;
     }
 
     .document-page {
       display: block;
-      width: 100%;
+      width: min(100%, 876px);
+      max-width: 100%;
       height: auto;
+      margin-inline: auto;
       background: #fff;
       box-shadow: 0 3px 14px rgba(0, 0, 0, .12);
     }
@@ -288,7 +350,7 @@
 
     @media (max-width: 600px) {
       body {
-        padding-top: 294px;
+        padding-top: 280px;
       }
 
       .completion-panel {
@@ -297,29 +359,70 @@
       }
 
       .instruction-actions {
-        gap: 8px;
+        gap: 4px;
+        padding: 0 6px;
+      }
+
+      .level-actions {
+        gap: 3px;
+      }
+
+      .instruction-actions .completion-panel {
+        flex-basis: 100%;
       }
 
       .instruction-button {
-        min-height: 36px;
-        padding: 8px 7px;
-        font-size: 10px;
+        height: 24px;
+        min-height: 24px;
+        padding: 3px 3px;
+        font-size: 8px;
       }
 
       .instruction-actions .done-assessment-button {
-        padding: 8px 7px;
+        height: 30px;
+        min-height: 30px;
+        padding: 5px 3px;
         font-size: 10px;
       }
 
       .assistance-button {
-        padding: 8px 7px;
+        height: 24px;
+        min-height: 24px;
+        padding: 5px 3px;
+        font-size: 8px;
+      }
+
+      .completion-panel {
+        gap: 3px;
+        padding: 0;
+        flex-wrap: nowrap;
+      }
+
+      .completion-panel select {
+        width: 68px;
+        padding: 6px 3px;
+        font-size: 8px;
+      }
+
+      .instruction-button,
+      .done-assessment-button,
+      .assistance-button,
+      .completion-panel select {
+        width: 110px;
+        height: 30px;
+        min-height: 30px;
         font-size: 10px;
       }
 
       .document-viewer {
         padding: 0 8px;
       }
+
+      main {
+        padding-top: 14px;
+      }
     }
+
   </style>
 </head>
 <body>
@@ -331,22 +434,26 @@
   </div>
 
   <header class="page-header">
-    <img class="logo" src="logo.png" alt="Sagility Logo">
     <h1>Assessment Instructions</h1>
     <p>Please select an assessment level to view the instructions.</p>
-    <div class="instruction-actions" role="tablist" aria-label="Assessment instruction levels">
-      <button class="instruction-button active" type="button" data-pdf="level%201.pdf" role="tab" aria-selected="true">Level 1 Assessment</button>
-      <button class="instruction-button" type="button" data-pdf="level%202.pdf" role="tab" aria-selected="false">Level 2 Assessment</button>
+    <div class="instruction-actions">
+      <div class="level-actions" role="tablist" aria-label="Assessment instruction levels">
+        <button class="instruction-button active" type="button" data-pdf="level%201.pdf" role="tab" aria-selected="true">Level 1 Assessment</button>
+        <button class="instruction-button" type="button" data-pdf="level%202.pdf" role="tab" aria-selected="false">Level 2 Assessment</button>
+      </div>
+      <button class="done-assessment-button" id="done-assessment-button" type="button">Done Assessment</button>
+      <button class="assistance-button" id="assistance-button" type="button">Need Assistance</button>
       <div class="completion-panel" aria-label="Assessment completion">
-        <select id="location-select" aria-label="Location selection">
-          <option value="" disabled>Location</option>
-          <option value="Iloilo City" selected>Iloilo City</option>
-          <option value="Bohol">Bohol</option>
-          <option value="Alabang">Alabang</option>
-          <option value="Quezon City">Quezon City</option>
-        </select>
-        <label for="seat-select">
-        <select id="seat-select" aria-label="Seat selection">
+        <div class="location-seat-stack">
+          <select id="location-select" aria-label="Location selection">
+            <option value="" disabled>Location</option>
+            <option value="Iloilo City" selected>Iloilo City</option>
+            <option value="Bohol">Bohol</option>
+            <option value="Alabang">Alabang</option>
+            <option value="Quezon City">Quezon City</option>
+          </select>
+          <label for="seat-select">
+          <select id="seat-select" aria-label="Seat selection">
           <option>Seat 1</option>
           <option>Seat 2</option>
           <option>Seat 3</option>
@@ -377,10 +484,9 @@
           <option>Seat 28</option>
           <option>Seat 29</option>
           <option>Seat 30</option>
-        </select>
-        </label>
-        <button class="done-assessment-button" id="done-assessment-button" type="button">Done Assessment</button>
-        <button class="assistance-button" id="assistance-button" type="button">Need Assistance</button>
+          </select>
+          </label>
+        </div>
       </div>
     </div>
   </header>
@@ -416,11 +522,14 @@
     const documentStatus = document.getElementById("document-status");
     const pdfLink = document.getElementById("pdf-link");
     const buttons = document.querySelectorAll(".instruction-button");
+    let currentPdfPath = "level%201.pdf";
+    let resizeTimer;
     const locationSelect = document.getElementById("location-select");
     const seatSelect = document.getElementById("seat-select");
     const doneAssessmentButton = document.getElementById("done-assessment-button");
     const assistanceButton = document.getElementById("assistance-button");
     const audioNotificationRetentionMs = 48 * 60 * 60 * 1000;
+
     async function notifyIndex(action) {
       if (!locationSelect.value) {
         return;
@@ -450,6 +559,7 @@
     });
 
     async function renderDocument(pdfPath) {
+      currentPdfPath = pdfPath;
       documentViewer.replaceChildren();
       documentStatus.textContent = "Loading instructions...";
 
@@ -500,6 +610,11 @@
           item.setAttribute("aria-selected", String(isActive));
         });
       });
+    });
+
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => renderDocument(currentPdfPath), 150);
     });
 
     renderDocument("level%201.pdf");
