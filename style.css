@@ -829,6 +829,14 @@ main.grid {
   font-weight: 600 !important;
 }
 
+.export-label-mobile {
+  display: inline;
+}
+
+.export-label-desktop {
+  display: none;
+}
+
 .export-data-btn:hover {
   background: #c8e3ff !important;
   box-shadow: none !important;
@@ -1742,18 +1750,21 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   }
 
   .notification-report-heading {
-    display: contents;
+    display: block;
+    position: relative;
   }
 
   .notification-report-heading > div:first-child {
-    order: 1;
+    padding-right: 108px;
   }
 
   .notification-report-actions {
-    position: static;
-    align-items: flex-start;
-    order: 0;
-    margin-top: 4px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: auto;
+    align-items: flex-end;
+    margin: 0;
   }
 
   .notification-report-overview {
@@ -1786,13 +1797,51 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: stretch;
-    gap: 8px;
+    justify-content: start;
+    gap: 5px;
+    font-size: 10px;
   }
 
-  .notification-export-controls input {
-    width: 100% !important;
-    flex: none;
+  .export-controls input {
+    width: 112px !important;
+    flex: 0 0 112px;
+    height: 32px;
+    padding: 6px 7px;
+    font-size: 10px;
+  }
+
+  .export-controls .export-data-btn {
+    width: 76px !important;
+    min-width: 76px;
+    height: 32px;
+    padding: 5px 6px !important;
+    font-size: 10px !important;
+  }
+
+  .export-label-desktop {
+    display: none;
+  }
+
+  .export-label-mobile {
+    display: inline;
+  }
+
+  .reports-section > .export-controls {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: stretch;
+    gap: 5px;
+  }
+
+  .reports-section > .export-controls label:nth-of-type(2),
+  .reports-section > .export-controls input:nth-of-type(2),
+  .reports-section > .export-controls button:nth-of-type(2) {
+    grid-row: 2;
+  }
+
+  .reports-section > .export-controls .export-status {
+    grid-column: 1 / -1;
   }
 
   .notification-export-controls .export-status {
