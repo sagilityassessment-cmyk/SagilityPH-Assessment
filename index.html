@@ -75,6 +75,7 @@
         <option value="Bohol">Bohol</option>
         <option value="Alabang">Alabang</option>
         <option value="Quezon City">Quezon City</option>
+        <option value="Testing">Testing</option>
       </select>
     </nav>
   </header>
@@ -124,6 +125,7 @@
           <option>Bohol</option>
           <option>Alabang</option>
           <option>Quezon City</option>
+          <option>Testing</option>
         </select>
         <button id="clearDataBtn" class="clear-data-btn" type="button">Clear Data</button>
       </div>
@@ -1663,6 +1665,13 @@
       sendButton.disabled = true;
       emailStatus.textContent = 'Sending Assessment...........';
       emailStatus.className = 'email-status sending';
+
+      if (location === 'Testing') {
+        emailStatus.textContent = 'Test mode: nothing was sent.';
+        emailStatus.className = 'email-status success';
+        sendButton.disabled = false;
+        return;
+      }
 
       if (GOOGLE_SCRIPT_URL) {
         try {
