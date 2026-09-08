@@ -7,6 +7,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="emailStatusPopup" class="email-status-popup hidden" role="status" aria-live="polite">
+    <div class="email-status-popup-card">
+      <button id="closeEmailStatusPopup" class="email-status-popup-close" type="button" aria-label="Close email status">&times;</button>
+      <div id="emailStatusPopupMessage" class="email-status-popup-message"></div>
+    </div>
+  </div>
   <!-- BACKGROUND DESIGN ELEMENTS -->
   <div class="bg-decoration bg-top-left">
     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
@@ -62,12 +68,33 @@
         </svg>
         Candidates Status
       </a>
-      <a href="candidate.html">
+      <a href="candidate.html" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
         Candidate Login
+      </a>
+      <a href="#seatManager">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          <path d="M8 8h8M8 12h8M8 16h4"></path>
+        </svg>
+        Seat Manager
+      </a>
+      <a href="https://sagilityassessment-cmyk.github.io/sagilityhiringfiles/home.html" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M4 5h16v14H4z"></path>
+          <path d="M8 9h8M8 13h5"></path>
+        </svg>
+        Sagility Files
+      </a>
+      <a href="https://sagilityassessment-cmyk.github.io/SagilityPH-Assessment/assessment-instructions.html" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 3h9l3 3v15H6z"></path>
+          <path d="M9 11h6M9 15h6M9 7h3"></path>
+        </svg>
+        Assessment Instructions
       </a>
       <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
         <option value="" disabled hidden selected>Location</option>
@@ -175,10 +202,11 @@
           </svg>
           <h2>Data Delivery History</h2>
         </div>
-        <input id="historySearchInput" class="history-search-input" type="search" placeholder="Search name, email, or location">
-        <ol id="sentHistoryList" class="sent-history-list"></ol>
-        <button id="deleteSelectedHistoryBtn" class="history-delete-selected" type="button" disabled>Delete</button>
+        <input id="recentHistorySearchInput" class="history-search-input" type="search" placeholder="Search recent name, email, or location">
+        <ol id="recentSentHistoryList" class="sent-history-list"></ol>
+        <button id="deleteRecentHistoryBtn" class="history-delete-selected" type="button" disabled>Delete</button>
       </section>
+
     </div>
   </main>
 
@@ -474,6 +502,44 @@
     </div>
   </section>
 
+  <section id="sentEmailHistory" class="card sent-email-history-section">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"></circle>
+        <polyline points="12 7 12 12 15 14"></polyline>
+      </svg>
+      <h2>History Data Sent Email</h2>
+    </div>
+    <div class="sent-email-history-toolbar">
+      <input id="historySearchInput" class="history-search-input" type="search" placeholder="Search name, email, or location">
+      <div class="history-export-range">
+        <label for="historyExportStart">From</label>
+        <input id="historyExportStart" type="date">
+        <label for="historyExportEnd">End</label>
+        <input id="historyExportEnd" type="date">
+        <button id="historyExportBtn" class="export-data-btn" type="button">Export CSV</button>
+        <p id="historyExportStatus" class="export-status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="sent-email-history-scroll">
+      <table class="reports-table sent-email-history-table">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Email</th><th>Location</th><th>Date and Time</th><th>View</th><th>Resend</th><th>Delete</th></tr>
+        </thead>
+        <tbody id="sentEmailHistoryBody"></tbody>
+      </table>
+    </div>
+    <button id="deleteSelectedHistoryBtn" class="history-delete-selected" type="button" disabled>Delete</button>
+  </section>
+
+  <dialog id="packageViewDialog" class="package-view-dialog">
+    <form method="dialog">
+      <button class="package-view-close" aria-label="Close package list">&times;</button>
+    </form>
+    <h2>Packages Sent</h2>
+    <div id="packageViewList"></div>
+  </dialog>
+
   <section id="reports" class="card reports-section">
     <h2>Reports</h2>
     <p class="packages-subtitle">Assessment count by location</p>
@@ -570,6 +636,39 @@
     </div>
   </section>
 
+  <!-- ASSESSMENT SEAT MANAGER -->
+  <section id="seatManager" class="card seat-manager-card">
+    <div class="card-header">
+      <h2>Assessment Seat Manager</h2>
+    </div>
+    <div class="seat-grid">
+      <div class="seat-card"><h3>Seat 1</h3><input type="text" inputmode="text" aria-label="Seat 1 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 2</h3><input type="text" inputmode="text" aria-label="Seat 2 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 3</h3><input type="text" inputmode="text" aria-label="Seat 3 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 4</h3><input type="text" inputmode="text" aria-label="Seat 4 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 5</h3><input type="text" inputmode="text" aria-label="Seat 5 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 6</h3><input type="text" inputmode="text" aria-label="Seat 6 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 7</h3><input type="text" inputmode="text" aria-label="Seat 7 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 8</h3><input type="text" inputmode="text" aria-label="Seat 8 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 9</h3><input type="text" inputmode="text" aria-label="Seat 9 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 10</h3><input type="text" inputmode="text" aria-label="Seat 10 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 11</h3><input type="text" inputmode="text" aria-label="Seat 11 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 12</h3><input type="text" inputmode="text" aria-label="Seat 12 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 13</h3><input type="text" inputmode="text" aria-label="Seat 13 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 14</h3><input type="text" inputmode="text" aria-label="Seat 14 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 15</h3><input type="text" inputmode="text" aria-label="Seat 15 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 16</h3><input type="text" inputmode="text" aria-label="Seat 16 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 17</h3><input type="text" inputmode="text" aria-label="Seat 17 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 18</h3><input type="text" inputmode="text" aria-label="Seat 18 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 19</h3><input type="text" inputmode="text" aria-label="Seat 19 value"><button class="seat-call-button" type="button">CALL</button></div>
+      <div class="seat-card"><h3>Seat 20</h3><input type="text" inputmode="text" aria-label="Seat 20 value"><button class="seat-call-button" type="button">CALL</button></div>
+    </div>
+    <div class="seat-manager-actions">
+      <button class="seat-manager-action clear-data-action" type="button">Clear Data</button>
+      <button class="seat-manager-action view-display-action" type="button">View Display</button>
+    </div>
+  </section>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -627,6 +726,7 @@
     chimeAudio.preload = 'auto';
     let notificationAudioUnlocked = false;
     const notificationQueue = [];
+    const observedAudioNotificationIds = new Set();
     let isNotificationQueueRunning = false;
     let sentHistoryRecords = [];
     let previousRecordIds = new Set();
@@ -650,6 +750,16 @@
         });
       });
     }
+
+    function showEmailStatusPopup(message, state) {
+      const popup = document.getElementById('emailStatusPopup');
+      document.getElementById('emailStatusPopupMessage').textContent = message;
+      popup.className = `email-status-popup ${state}`;
+    }
+
+    document.getElementById('closeEmailStatusPopup').addEventListener('click', () => {
+      document.getElementById('emailStatusPopup').classList.add('hidden');
+    });
 
     function unlockNotificationAudio() {
       if (notificationAudioUnlocked) {
@@ -723,12 +833,21 @@
             .onSnapshot(snapshot => {
               if (!hasLoadedAudioNotifications) {
                 hasLoadedAudioNotifications = true;
+                snapshot.docs.forEach(notificationDocument => {
+                  if (notificationDocument.data().source === 'assessment-audio') {
+                    observedAudioNotificationIds.add(notificationDocument.id);
+                  }
+                });
                 return;
               }
 
               snapshot.docChanges()
                 .filter(change => change.type === 'added')
                 .forEach(change => {
+                  if (observedAudioNotificationIds.has(change.doc.id)) {
+                    return;
+                  }
+                  observedAudioNotificationIds.add(change.doc.id);
                   const notification = change.doc.data();
                   if (notification.source !== 'assessment-audio') {
                     return;
@@ -821,6 +940,7 @@
 
       updateSelectedPackages();
       renderSentHistory(document.getElementById('historySearchInput')?.value || '');
+      renderRecentSentHistory(document.getElementById('recentHistorySearchInput')?.value || '');
       renderReports();
     }
 
@@ -1174,7 +1294,7 @@
 
     function updateDeleteSelectedButtonState() {
       const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
-      const count = document.querySelectorAll('.history-select-checkbox:checked').length;
+      const count = document.querySelectorAll('.history-delete-checkbox:checked').length;
       deleteButton.disabled = count === 0;
       deleteButton.textContent = count > 0 ? `Delete (${count})` : 'Delete';
     }
@@ -1188,37 +1308,61 @@
 
     function renderSentHistory(searchTerm = '') {
       const search = searchTerm.trim().toLowerCase();
-      const currentDateKey = getManilaDateKey();
-      const historyList = document.getElementById('sentHistoryList');
-      historyList.innerHTML = '';
-      const filteredHistory = getVisibleHistoryRecords().filter(item =>
-        getRecordDateKey(item) === currentDateKey &&
-        (!search || `${item.name} ${item.email} ${item.location}`.toLowerCase().includes(search))
-      );
+      const historyBody = document.getElementById('sentEmailHistoryBody');
+      const records = getVisibleHistoryRecords()
+        .filter(item => !search || `${item.name || ''} ${item.email || ''} ${item.location || ''}`.toLowerCase().includes(search))
+        .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0));
 
-      if (filteredHistory.length === 0) {
-        historyList.innerHTML = `<li class="sent-history-empty">${search ? 'No matching assessments' : 'No sent assessments yet'}</li>`;
-        updateDeleteSelectedButtonState();
-        return;
-      }
+      historyBody.innerHTML = records.length
+        ? records.map((item, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(item.name || '')}</td>
+            <td>${escapeHtml(item.email || '')}</td>
+            <td>${escapeHtml(normalizeLocation(item.location || ''))}</td>
+            <td>${escapeHtml(item.date || '')}</td>
+            <td><button class="history-row-button history-view-button" type="button" data-record-id="${escapeHtml(item.recordId || '')}">View</button></td>
+            <td><button class="history-row-button history-resend-button" type="button" data-record-id="${escapeHtml(item.recordId || '')}">Send</button></td>
+            <td><input type="checkbox" class="history-delete-checkbox" data-record-id="${escapeHtml(item.recordId || '')}" aria-label="Select ${escapeHtml(item.name || 'record')} for deletion"></td>
+          </tr>`).join('')
+        : '<tr><td colspan="8">No sent email records found</td></tr>';
 
-      filteredHistory.forEach(item => {
-        const entry = document.createElement('li');
-        entry.className = 'history-item';
-        entry.innerHTML = `
-          <label class="history-select-row">
-            <input type="checkbox" class="history-select-checkbox" data-record-id="${item.recordId || ''}">
-            <span class="history-item-text">${item.date} - ${item.name} - ${item.email} - ${item.location}</span>
-          </label>
-        `;
-
-        const checkbox = entry.querySelector('.history-select-checkbox');
+      historyBody.querySelectorAll('.history-delete-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', updateDeleteSelectedButtonState);
-
-        historyList.appendChild(entry);
       });
-
+      historyBody.querySelectorAll('.history-view-button').forEach(button => {
+        button.addEventListener('click', () => showSentPackages(button.dataset.recordId));
+      });
+      historyBody.querySelectorAll('.history-resend-button').forEach(button => {
+        button.addEventListener('click', () => resendSentEmail(button.dataset.recordId, button));
+      });
       updateDeleteSelectedButtonState();
+    }
+
+    function renderRecentSentHistory(searchTerm = '') {
+      const search = searchTerm.trim().toLowerCase();
+      const recentList = document.getElementById('recentSentHistoryList');
+      const cutoff = Date.now() - (48 * 60 * 60 * 1000);
+      const records = getVisibleHistoryRecords()
+        .filter(item => Number(item.timestamp || 0) >= cutoff)
+        .filter(item => !search || `${item.name || ''} ${item.email || ''} ${item.location || ''}`.toLowerCase().includes(search))
+        .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0));
+
+      recentList.innerHTML = records.length
+        ? records.map(item => `<li class="history-item recent-history-row"><input type="checkbox" class="recent-history-delete-checkbox" data-record-id="${escapeHtml(item.recordId || '')}" aria-label="Select ${escapeHtml(item.name || 'record')} for deletion"><span class="history-item-text">${escapeHtml(item.date || '')} - ${escapeHtml(item.name || '')} - ${escapeHtml(item.email || '')} - ${escapeHtml(item.location || '')}</span></li>`).join('')
+        : `<li class="sent-history-empty">${search ? 'No matching recent assessments' : 'No sent assessments in the last 48 hours'}</li>`;
+
+      recentList.querySelectorAll('.recent-history-delete-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateRecentDeleteButtonState);
+      });
+      updateRecentDeleteButtonState();
+    }
+
+    function updateRecentDeleteButtonState() {
+      const deleteButton = document.getElementById('deleteRecentHistoryBtn');
+      const count = document.querySelectorAll('.recent-history-delete-checkbox:checked').length;
+      deleteButton.disabled = count === 0;
+      deleteButton.textContent = count > 0 ? `Delete (${count})` : 'Delete';
     }
 
     function renderReports() {
@@ -1275,8 +1419,7 @@
       });
       const detailsBody = document.getElementById('notificationDetailsBody');
       if (detailsBody) {
-        const records = getLatestNotificationRecords()
-          .filter(item => getRecordDateKey(item) === currentDateKey)
+        const records = getVisibleNotificationRecords()
           .filter(matchesNotificationSearch)
           .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0));
         detailsBody.innerHTML = records.length
@@ -1435,7 +1578,98 @@
       exportStatus.className = 'export-status success';
     }
 
-    async function addSentHistory(candidateName, recipient, location) {
+    function getHistoryRecord(recordId) {
+      return sentHistoryRecords.find(record => record.recordId === recordId);
+    }
+
+    function showSentPackages(recordId) {
+      const record = getHistoryRecord(recordId);
+      const dialog = document.getElementById('packageViewDialog');
+      const list = document.getElementById('packageViewList');
+      const packages = Array.isArray(record?.packages) ? record.packages : [];
+      list.innerHTML = packages.length
+        ? packages.map(item => `<a href="${escapeHtml(item.url || '#')}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name || 'Package')}</a>`).join('')
+        : '<p>No package details were saved for this older record.</p>';
+      dialog.showModal();
+    }
+
+    async function resendSentEmail(recordId, button) {
+      const record = getHistoryRecord(recordId);
+      const packages = Array.isArray(record?.packages) ? record.packages : [];
+      if (!record || packages.length === 0) {
+        alert('This record has no saved package details to resend.');
+        return;
+      }
+
+      button.disabled = true;
+      showEmailStatusPopup('Sending follow-up email...', 'sending');
+      try {
+        const payload = {
+          name: record.name,
+          email: record.email,
+          location: record.location,
+          packages,
+          isRetake: false,
+          isFollowUp: true
+        };
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        await addSentHistory(record.name, record.email, record.location, packages, true);
+        showEmailStatusPopup('Follow-up email sent successfully', 'success');
+      } catch (error) {
+        console.error('Follow-up email failed:', error);
+        showEmailStatusPopup('Unable to send follow-up email', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function exportSentEmailHistory() {
+      const start = document.getElementById('historyExportStart').value;
+      const end = document.getElementById('historyExportEnd').value;
+      const status = document.getElementById('historyExportStatus');
+      if (!start || !end) {
+        status.textContent = 'Choose a start and end date first.';
+        status.className = 'export-status error';
+        return;
+      }
+      if (start > end) {
+        status.textContent = 'The start date must be before the end date.';
+        status.className = 'export-status error';
+        return;
+      }
+
+      const records = getVisibleHistoryRecords().filter(item => {
+        const dateKey = getRecordDateKey(item);
+        return dateKey >= start && dateKey <= end;
+      });
+      if (records.length === 0) {
+        status.textContent = 'No sent email records found in that range.';
+        status.className = 'export-status error';
+        return;
+      }
+
+      const rows = [
+        ['#', 'Name', 'Email', 'Location', 'Date and Time', 'Packages'],
+        ...records.map((item, index) => [
+          index + 1,
+          item.name,
+          item.email,
+          normalizeLocation(item.location),
+          item.date,
+          (Array.isArray(item.packages) ? item.packages : []).map(packageItem => packageItem.name).join(' | ')
+        ])
+      ];
+      downloadCsv(`sent-email-history-${start}-to-${end}.csv`, rows);
+      status.textContent = `${records.length} record(s) exported.`;
+      status.className = 'export-status success';
+    }
+
+    async function addSentHistory(candidateName, recipient, location, packages = [], isFollowUp = false) {
       await firebaseAuthReady;
       const docRef = await firestore.collection('sentHistory').add({
         date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
@@ -1444,6 +1678,8 @@
         name: candidateName,
         email: recipient,
         location: normalizeLocation(location),
+        packages,
+        isFollowUp,
         deleted: false,
         deletedAt: null,
         recordId: ''
@@ -1503,14 +1739,15 @@
               sentHistoryRecords = newRecords;
               notificationRecords = sentHistoryRecords.filter(item => String(item.source || '').startsWith('candidate-notification'));
               renderSentHistory(document.getElementById('historySearchInput').value);
+              renderRecentSentHistory(document.getElementById('recentHistorySearchInput').value);
               renderReports();
             }, error => {
-              document.getElementById('sentHistoryList').innerHTML = '<li class="sent-history-empty">History unavailable: check Firestore rules</li>';
+              document.getElementById('sentEmailHistoryBody').innerHTML = '<tr><td colspan="8">History unavailable: check Firestore rules</td></tr>';
               console.error('Firestore history read failed:', error);
             });
         })
         .catch(error => {
-          document.getElementById('sentHistoryList').innerHTML = '<li class="sent-history-empty">History unavailable: add this site to Firebase Authorized domains</li>';
+          document.getElementById('sentEmailHistoryBody').innerHTML = '<tr><td colspan="8">History unavailable: add this site to Firebase Authorized domains</td></tr>';
           document.getElementById('emailStatus').textContent = 'Firebase history unavailable.';
           document.getElementById('emailStatus').className = 'email-status error';
           console.error('Firebase authentication failed:', error);
@@ -1520,6 +1757,10 @@
     document.getElementById('historySearchInput').addEventListener('input', event => {
       renderSentHistory(event.target.value);
     });
+    document.getElementById('recentHistorySearchInput').addEventListener('input', event => {
+      renderRecentSentHistory(event.target.value);
+    });
+    document.getElementById('historyExportBtn').addEventListener('click', exportSentEmailHistory);
 
     document.getElementById('notificationSearchInput').addEventListener('input', renderReports);
     document.getElementById('notificationSearchBtn').addEventListener('click', renderReports);
@@ -1532,7 +1773,7 @@
 
     document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', async () => {
       const deleteButton = document.getElementById('deleteSelectedHistoryBtn');
-      const selectedCheckboxes = document.querySelectorAll('.history-select-checkbox:checked');
+      const selectedCheckboxes = document.querySelectorAll('.history-delete-checkbox:checked');
       if (!selectedCheckboxes.length) return;
 
       const passwordInput = window.prompt('Enter password to delete history:');
@@ -1570,6 +1811,42 @@
         console.error('Firestore batch delete failed:', error);
         alert('Unable to delete the selected records from all browsers. Please check the Firestore permissions and try again.');
         updateDeleteSelectedButtonState();
+      }
+    });
+
+    document.getElementById('deleteRecentHistoryBtn').addEventListener('click', async () => {
+      const deleteButton = document.getElementById('deleteRecentHistoryBtn');
+      const selectedCheckboxes = document.querySelectorAll('.recent-history-delete-checkbox:checked');
+      if (!selectedCheckboxes.length) return;
+
+      const passwordInput = window.prompt('Enter password to delete history:');
+      if (passwordInput !== 'Sagility_1') {
+        if (passwordInput !== null) alert('Incorrect password.');
+        return;
+      }
+
+      if (!window.confirm('Delete selected history records?')) return;
+      const ids = [...selectedCheckboxes].map(checkbox => checkbox.dataset.recordId).filter(Boolean);
+      if (!ids.length) return;
+
+      deleteButton.disabled = true;
+      try {
+        await firebaseAuthReady;
+        const batch = firestore.batch();
+        ids.forEach(id => batch.update(firestore.collection('sentHistory').doc(id), {
+          deleted: true,
+          deletedAt: Date.now()
+        }));
+        await batch.commit();
+        const deletedIds = new Set(ids);
+        sentHistoryRecords = sentHistoryRecords.filter(record => !deletedIds.has(record.recordId));
+        renderRecentSentHistory(document.getElementById('recentHistorySearchInput').value);
+        renderSentHistory(document.getElementById('historySearchInput').value);
+        renderReports();
+      } catch (error) {
+        console.error('Recent history delete failed:', error);
+        alert('Unable to delete the selected records. Please check the Firestore permissions.');
+        updateRecentDeleteButtonState();
       }
     });
 
@@ -1612,6 +1889,7 @@
 
     setInterval(() => {
       renderSentHistory(document.getElementById('historySearchInput').value);
+      renderRecentSentHistory(document.getElementById('recentHistorySearchInput').value);
       renderReports();
     }, 60000);
 
@@ -1685,7 +1963,7 @@
           emailStatus.className = 'email-status success';
 
           try {
-            await addSentHistory(candidateName, recipient, location);
+            await addSentHistory(candidateName, recipient, location, packages, isFollowUp);
           } catch (historyError) {
             emailStatus.textContent = 'Successfully Sent. History sync failed.';
             emailStatus.className = 'email-status error';
@@ -1714,7 +1992,7 @@
         : `Hi ${candidateName},\n\nGood Day!\n\nPlease click link/s below to start your assessment.`;
       const body = `${intro}\n\n${packageLinks.join('\n')}\n\nBefore You Start:\n\n• We recommend using a Laptop/PC and a headset.\n• Make sure you are in a quiet environment.\n• Use your active email address and enter the security code when prompted.\n• Read all instructions carefully before taking the assessment.\n\nNeed Assistance?\n\nIf you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.\n\nTime: 11am-8pm MNL\nLink: Meeting Invite\nMeeting ID: 479 656 747 406 7\nPasscode: vi3nV3NB\n\nImportant Reminders:\n\n⚠️ Use the assessment link only once.\n🔒 Do not share or forward the link.\n📍 The system records IP address and location.\n📇 Assessment materials are confidential. Any misuse may affect your application.\n\nFor questions or assistance, please contact:\nPHLTestAdmin@Sagilityhealth.com\n\nThank you, and good luck with your assessment!\n\nBest Regards,\n\nTalent Acquisition- Sagility Recruitment - Test Admin\n${location}`;
       window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      await addSentHistory(candidateName, recipient, location);
+      await addSentHistory(candidateName, recipient, location, packages, isFollowUp);
       emailStatus.textContent = 'Email draft opened.';
       emailStatus.className = 'email-status success';
       sendButton.disabled = false;
@@ -1739,8 +2017,15 @@
       document.getElementById('emailStatus').className = 'email-status';
       updateSelectedPackages();
       renderSentHistory(document.getElementById('historySearchInput').value);
+      renderRecentSentHistory(document.getElementById('recentHistorySearchInput').value);
       renderReports();
       alert('Data cleared successfully.');
+    });
+
+    document.querySelector('.clear-data-action').addEventListener('click', () => {
+      document.querySelectorAll('.seat-card input').forEach(input => {
+        input.value = '';
+      });
     });
 
     // Initialize on page load
@@ -1757,5 +2042,6 @@
       initializeAssessmentAudioNotifications();
     });
   </script>
+  <script type="module" src="seat-manager.js"></script>
 </body>
 </html>
