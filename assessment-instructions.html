@@ -237,7 +237,7 @@
       width: 110px;
       min-width: 0;
       background: #fff;
-      color: #26343c;
+      color: #1f5d39;
       font-size: 13px;
       font-weight: 600;
     }
@@ -358,12 +358,12 @@
       padding: 0 12px;
     }
 
-    .document-page {
+    .document-frame {
       display: block;
-      width: min(100%, 876px);
-      max-width: 100%;
-      height: auto;
-      margin-inline: auto;
+      width: 100%;
+      height: min(1100px, calc(100vh - 260px));
+      min-height: 720px;
+      border: 0;
       background: #fff;
       box-shadow: 0 3px 14px rgba(0, 0, 0, .12);
     }
@@ -547,10 +547,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script type="module">
-    import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
-
     firebase.initializeApp({
       apiKey: "AIzaSyBZVAXmgE-24AVUFB_7xS4GQi4OwkIvptQ",
       authDomain: "sagility-assessment.firebaseapp.com",
@@ -570,7 +566,6 @@
     const buttons = document.querySelectorAll(".instruction-button");
     let currentPdfPath = "level%201.pdf";
     let resizeTimer;
-    const pdfCache = new Map();
     let renderRequestId = 0;
     const locationSelect = document.getElementById("location-select");
     const seatSelect = document.getElementById("seat-select");
@@ -681,73 +676,26 @@
     locationSelect.addEventListener("change", saveInstructionState);
     seatSelect.addEventListener("change", saveInstructionState);
 
-    function scheduleIdle(callback) {
-      if ("requestIdleCallback" in window) {
-        window.requestIdleCallback(callback, { timeout: 120 });
-      } else {
-        window.setTimeout(callback, 0);
-      }
-    }
-
-    async function getPdfDocument(pdfPath) {
-      if (!pdfCache.has(pdfPath)) {
-        pdfCache.set(pdfPath, pdfjsLib.getDocument(pdfPath).promise);
-      }
-      return pdfCache.get(pdfPath);
-    }
-
     async function renderDocument(pdfPath) {
       const requestId = ++renderRequestId;
       currentPdfPath = pdfPath;
-      documentViewer.replaceChildren();
+      const frame = document.createElement("iframe");
+      frame.className = "document-frame";
+      frame.title = "Assessment instructions";
+      frame.src = `${pdfPath}#toolbar=0&navpanes=0&view=FitH`;
+      documentViewer.replaceChildren(frame);
       documentStatus.textContent = "Loading instructions...";
 
-      try {
-        const pdf = await getPdfDocument(pdfPath);
-        if (requestId !== renderRequestId) return;
-        const pages = Array.from({ length: pdf.numPages });
-        const renderPage = async pageNumber => {
-          if (requestId !== renderRequestId) return;
-          const page = await pdf.getPage(pageNumber);
-          const baseViewport = page.getViewport({ scale: 1 });
-          const scale = Math.min((documentViewer.clientWidth || 876) / baseViewport.width, 1.5);
-          const viewport = page.getViewport({ scale });
-          const outputScale = 4;
-          const canvas = document.createElement("canvas");
-          const context = canvas.getContext("2d");
-
-          canvas.className = "document-page";
-          canvas.width = Math.floor(viewport.width * outputScale);
-          canvas.height = Math.floor(viewport.height * outputScale);
-          canvas.style.width = `${viewport.width}px`;
-          canvas.style.height = `${viewport.height}px`;
-          canvas.setAttribute("aria-label", `Assessment instruction page ${pageNumber}`);
-          pages[pageNumber - 1] = canvas;
-          await page.render({
-            canvasContext: context,
-            viewport,
-            transform: [outputScale, 0, 0, outputScale, 0, 0]
-          }).promise;
-          if (requestId === renderRequestId) {
-            documentViewer.replaceChildren(...pages.filter(Boolean));
-          }
-        };
-
-        await renderPage(1);
-        if (requestId !== renderRequestId) return;
-        documentStatus.textContent = "";
-        let nextPage = 2;
-        const renderRemainingPages = () => {
-          if (requestId !== renderRequestId || nextPage > pdf.numPages) return;
-          const pageNumber = nextPage;
-          nextPage += 1;
-          renderPage(pageNumber).then(() => scheduleIdle(renderRemainingPages));
-        };
-        scheduleIdle(renderRemainingPages);
-      } catch (error) {
-        documentStatus.textContent = "The instructions could not be displayed here. Use the link below to open the PDF.";
-        console.error(error);
-      }
+      frame.addEventListener("load", () => {
+        if (requestId === renderRequestId) {
+          documentStatus.textContent = "";
+        }
+      }, { once: true });
+      frame.addEventListener("error", () => {
+        if (requestId === renderRequestId) {
+          documentStatus.textContent = "The instructions could not be displayed here. Use the link below to open the PDF.";
+        }
+      }, { once: true });
     }
 
     buttons.forEach((button) => {

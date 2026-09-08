@@ -826,9 +826,7 @@
       }
 
       isNotificationQueueRunning = true;
-      // Start the voice immediately; the chime should not delay the announcement.
-      playChime();
-      speakNextNotification();
+      playChime().then(speakNextNotification);
     }
 
     function triggerAssessmentNotification(firstName, location) {
