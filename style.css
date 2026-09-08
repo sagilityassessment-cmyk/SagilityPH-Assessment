@@ -832,6 +832,8 @@ button.view-display-action:hover {
 
 .notification-details-table {
   margin-top: 22px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .notification-summary-table {
@@ -1052,7 +1054,8 @@ button.view-display-action:hover {
 .notification-details-table thead th {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+  background: #dceeff;
 }
 
 .notification-status-cell {
@@ -2740,11 +2743,20 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   width: 100%;
   min-width: 900px;
   margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .sent-email-history-table th,
 .sent-email-history-table td {
   vertical-align: middle;
+}
+
+.sent-email-history-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #dceeff;
 }
 
 .sent-email-history-table th:first-child,
@@ -2784,7 +2796,7 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 .history-delete-checkbox {
   width: 14px !important;
   height: 14px;
-  margin: 0;
+  margin: 0 auto;
 }
 
 .package-view-dialog {
