@@ -264,8 +264,10 @@ nav a {
 }
 
 .typing-results-table-wrap {
-  max-height: 470px;
-  overflow: auto;
+  height: 350px;
+  max-height: 350px;
+  overflow-x: auto;
+  overflow-y: auto;
   border: 1px solid var(--border-light);
   border-radius: 8px;
 }
