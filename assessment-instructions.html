@@ -557,8 +557,46 @@
     const assistanceButton = document.getElementById("assistance-button");
     const notificationWaitPopup = document.getElementById("notificationWaitPopup");
     const audioNotificationRetentionMs = 48 * 60 * 60 * 1000;
+    const instructionStateKey = "sagility-assessment-instruction-state";
     let notificationActionLocked = false;
     let notificationPopupTimer;
+
+    function saveInstructionState() {
+      localStorage.setItem(instructionStateKey, JSON.stringify({
+        location: locationSelect.value,
+        seat: seatSelect.value,
+        pdfPath: currentPdfPath
+      }));
+    }
+
+    function restoreInstructionState() {
+      try {
+        const savedState = JSON.parse(localStorage.getItem(instructionStateKey) || "{}");
+        const hasLocation = Array.from(locationSelect.options).some(option => option.value === savedState.location);
+        const hasSeat = Array.from(seatSelect.options).some(option => option.value === savedState.seat);
+        const savedButton = Array.from(buttons).find(button => button.dataset.pdf === savedState.pdfPath);
+
+        if (hasLocation) {
+          locationSelect.value = savedState.location;
+        }
+        if (hasSeat) {
+          seatSelect.value = savedState.seat;
+        }
+        if (savedButton) {
+          buttons.forEach(button => {
+            const isActive = button === savedButton;
+            button.classList.toggle("active", isActive);
+            button.setAttribute("aria-selected", String(isActive));
+          });
+          pdfLink.href = savedState.pdfPath;
+          return savedState.pdfPath;
+        }
+      } catch (error) {
+        localStorage.removeItem(instructionStateKey);
+      }
+
+      return "level%201.pdf";
+    }
 
     async function notifyIndex(action) {
       if (!locationSelect.value) {
@@ -613,6 +651,9 @@
       handleAssessmentAction("Need Assistance", assistanceButton);
     });
 
+    locationSelect.addEventListener("change", saveInstructionState);
+    seatSelect.addEventListener("change", saveInstructionState);
+
     async function renderDocument(pdfPath) {
       currentPdfPath = pdfPath;
       documentViewer.replaceChildren();
@@ -664,6 +705,7 @@
           item.classList.toggle("active", isActive);
           item.setAttribute("aria-selected", String(isActive));
         });
+        saveInstructionState();
       });
     });
 
@@ -672,7 +714,7 @@
       resizeTimer = window.setTimeout(() => renderDocument(currentPdfPath), 150);
     });
 
-    renderDocument("level%201.pdf");
+    renderDocument(restoreInstructionState());
   </script>
 </body>
 </html>
