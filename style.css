@@ -45,6 +45,7 @@
 html, body {
   width: 100%;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -488,6 +489,7 @@ button.view-display-action:hover {
   margin: 0 auto 40px;
   width: calc(100% - 48px);
   max-width: 1424px;
+  min-width: 0;
   scroll-margin-top: 150px;
 }
 
@@ -519,9 +521,10 @@ button.view-display-action:hover {
 
 .weekly-report-chart {
   margin-top: 8px;
-  margin-right: -28px;
-  margin-left: -28px;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 
 .weekly-chart-title {
@@ -534,9 +537,11 @@ button.view-display-action:hover {
 
 .weekly-legend {
   display: flex;
+  flex-wrap: wrap;
   gap: 18px;
   margin: 0 0 8px;
   padding-left: 28px;
+  padding-right: 28px;
   color: var(--primary-blue);
   font-size: 12px;
 }
@@ -563,12 +568,14 @@ button.view-display-action:hover {
 
 .weekly-chart-scroll {
   width: 100%;
-  overflow-x: auto;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .weekly-chart-scroll svg {
   display: block;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   height: 220px;
 }
@@ -799,7 +806,7 @@ button.view-display-action:hover {
 
 .reports-content {
   display: grid;
-  grid-template-columns: minmax(180px, 260px) 1fr;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
   gap: 32px;
   align-items: center;
 }
@@ -843,7 +850,7 @@ button.view-display-action:hover {
 
 .notification-report-overview {
   display: grid;
-  grid-template-columns: minmax(220px, 34%) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 34%) minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
   margin-top: 18px;
@@ -943,6 +950,7 @@ button.view-display-action:hover {
   font-size: 10px;
   font-weight: 700;
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .notification-chart-bars {
@@ -1042,6 +1050,7 @@ button.view-display-action:hover {
 .notification-details-scroll {
   max-height: 430px;
   overflow-y: auto;
+  overflow-x: auto;
   margin-top: 14px;
   border: 1px solid var(--border-light);
   border-radius: 8px;
@@ -1080,6 +1089,7 @@ button.view-display-action:hover {
   display: flex;
   flex-direction: column;
   gap: 13px;
+  min-width: 0;
 }
 
 .report-bar-row {
@@ -2034,7 +2044,7 @@ button {
   font-family: inherit;
 }
 
-button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action) {
+button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.notes-add-button):not(.notes-click-button):not(.notes-save-button):not(.notes-delete-button) {
   width: 100%;
   padding: 16px 20px;
   border: none;
@@ -2208,7 +2218,7 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   body {
     display: flex;
     flex-direction: column;
-    padding-top: 172px;
+    padding-top: 264px;
     padding-bottom: 20px;
   }
 
@@ -2263,10 +2273,10 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 
   .notification-export-controls {
     order: 2;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
     justify-content: start;
+    flex-wrap: wrap;
     gap: 5px;
     font-size: 10px;
   }
@@ -2296,25 +2306,16 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
   }
 
   .reports-section > .export-controls {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
-    justify-content: stretch;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     gap: 5px;
   }
 
-  .reports-section > .export-controls label:nth-of-type(2),
-  .reports-section > .export-controls input:nth-of-type(2),
-  .reports-section > .export-controls button:nth-of-type(2) {
-    grid-row: 2;
-  }
-
-  .reports-section > .export-controls .export-status {
-    grid-column: 1 / -1;
-  }
-
+  .reports-section > .export-controls .export-status,
   .notification-export-controls .export-status {
-    grid-column: 1 / -1;
+    flex-basis: 100%;
   }
 
   .notification-report-actions {
@@ -2452,8 +2453,14 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
     width: calc(100% - 32px);
   }
 
+  .sent-email-history-section {
+    order: 3;
+    width: calc(100% - 32px);
+    margin: 0 16px 24px;
+  }
+
   .seat-manager-card {
-    order: 2;
+    order: 99;
     width: calc(100% - 32px);
     margin: 0 16px 16px;
   }
@@ -2605,12 +2612,13 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.
 
   .weekly-chart-title,
   .weekly-legend {
-    padding-left: 20px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .weekly-report-chart {
-    margin-right: -20px;
-    margin-left: -20px;
+    margin-right: 0;
+    margin-left: 0;
   }
 
   .weekly-chart-grid {

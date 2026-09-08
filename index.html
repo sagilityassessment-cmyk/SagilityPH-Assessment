@@ -96,6 +96,13 @@
         </svg>
         Assessment Instructions
       </a>
+      <a href="notes.html" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 4h14v16H5z"></path>
+          <path d="M8 8h8M8 12h8M8 16h5"></path>
+        </svg>
+        Notes
+      </a>
       <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
         <option value="" disabled hidden selected>Location</option>
         <option value="Iloilo City">Iloilo City</option>
@@ -557,14 +564,13 @@
       </table>
       <div id="reportChart" class="report-chart" aria-label="Assessment count by location"></div>
     </div>
-    <div class="reports-total">Total unique emails today: <strong id="reportTotalCount">0</strong></div>
+    <div class="reports-total">Total unique emails: <strong id="reportTotalCount">0</strong></div>
     <div class="export-controls">
-      <label for="exportDateInput">Export date</label>
+      <label for="exportDateInput">From</label>
       <input id="exportDateInput" type="date">
-      <button id="exportDataBtn" class="export-data-btn" type="button"><span class="export-label-desktop">Export Data</span><span class="export-label-mobile">Download</span></button>
-      <label for="exportMonthInput">Export month</label>
-      <input id="exportMonthInput" type="month">
-      <button id="exportMonthBtn" class="export-data-btn" type="button"><span class="export-label-desktop">Export Month</span><span class="export-label-mobile">Download</span></button>
+      <label for="exportEndInput">End</label>
+      <input id="exportEndInput" type="date">
+      <button id="exportDataBtn" class="export-data-btn" type="button">Export CSV</button>
       <p id="exportStatus" class="export-status" role="status" aria-live="polite"></p>
     </div>
   </section>
@@ -622,12 +628,11 @@
     </div>
     <div class="notification-export-row">
       <div class="export-controls notification-export-controls">
-        <label for="notificationExportDateInput">Export Date</label>
+        <label for="notificationExportDateInput">From</label>
         <input id="notificationExportDateInput" type="date">
-        <button id="notificationExportDataBtn" class="export-data-btn" type="button"><span class="export-label-desktop">Export Data</span><span class="export-label-mobile">Download</span></button>
-        <label for="notificationExportMonthInput">Export Month</label>
-        <input id="notificationExportMonthInput" type="month">
-        <button id="notificationExportMonthBtn" class="export-data-btn" type="button"><span class="export-label-desktop">Export Month</span><span class="export-label-mobile">Download</span></button>
+        <label for="notificationExportEndInput">End</label>
+        <input id="notificationExportEndInput" type="date">
+        <button id="notificationExportDataBtn" class="export-data-btn" type="button">Export CSV</button>
         <p id="notificationExportStatus" class="export-status" role="status" aria-live="polite"></p>
       </div>
       <div class="notification-delete-controls">
@@ -728,6 +733,7 @@
     const notificationQueue = [];
     const observedAudioNotificationIds = new Set();
     let isNotificationQueueRunning = false;
+    let emailStatusPopupTimer;
     let sentHistoryRecords = [];
     let previousRecordIds = new Set();
     let hasLoadedHistory = false;
@@ -755,9 +761,14 @@
       const popup = document.getElementById('emailStatusPopup');
       document.getElementById('emailStatusPopupMessage').textContent = message;
       popup.className = `email-status-popup ${state}`;
+      window.clearTimeout(emailStatusPopupTimer);
+      emailStatusPopupTimer = window.setTimeout(() => {
+        popup.classList.add('hidden');
+      }, 10000);
     }
 
     document.getElementById('closeEmailStatusPopup').addEventListener('click', () => {
+      window.clearTimeout(emailStatusPopupTimer);
       document.getElementById('emailStatusPopup').classList.add('hidden');
     });
 
@@ -815,7 +826,9 @@
       }
 
       isNotificationQueueRunning = true;
-      playChime().then(speakNextNotification);
+      // Start the voice immediately; the chime should not delay the announcement.
+      playChime();
+      speakNextNotification();
     }
 
     function triggerAssessmentNotification(firstName, location) {
@@ -1368,7 +1381,6 @@
     }
 
     function renderReports() {
-      const currentDateKey = getManilaDateKey();
       const notificationSearch = document.getElementById('notificationSearchInput')?.value.trim().toLowerCase() || '';
       const matchesNotificationSearch = item => !notificationSearch || `${item.name || ''} ${item.email || ''} ${item.location || ''}`.toLowerCase().includes(notificationSearch);
       const counts = {
@@ -1386,7 +1398,6 @@
       const statusCounts = Object.fromEntries(Object.keys(notificationCounts).map(location => [location, { 'No Status': 0, Done: 0 }]));
       const countedEmails = new Set();
       getVisibleHistoryRecords()
-        .filter(item => getRecordDateKey(item) === currentDateKey)
         .forEach(item => {
           const email = String(item.email || '').trim().toLowerCase();
           if (!email || countedEmails.has(email)) return;
@@ -1396,8 +1407,8 @@
             counts[location] += 1;
           }
         });
+      // Keep the candidate status graph historical instead of resetting it at midnight.
       getLatestNotificationRecords()
-        .filter(item => getRecordDateKey(item) === currentDateKey)
         .forEach(item => {
           const location = normalizeLocation(item.location);
           const status = item.status === 'Done' ? 'Done' : 'No Status';
@@ -1522,22 +1533,27 @@
       URL.revokeObjectURL(downloadUrl);
     }
 
-    function exportHistoryCsv(period = 'day') {
-      const selectedDate = document.getElementById('exportDateInput').value;
-      const selectedMonth = document.getElementById('exportMonthInput').value;
+    function exportHistoryCsv() {
+      const start = document.getElementById('exportDateInput').value;
+      const end = document.getElementById('exportEndInput').value;
       const exportStatus = document.getElementById('exportStatus');
-      const selectedPeriod = period === 'month' ? selectedMonth : selectedDate;
-      if (!selectedPeriod) {
-        exportStatus.textContent = period === 'month' ? 'Choose a month first.' : 'Choose a date first.';
+      if (!start || !end) {
+        exportStatus.textContent = 'Choose a start and end date first.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+      if (start > end) {
+        exportStatus.textContent = 'The start date must be before the end date.';
         exportStatus.className = 'export-status error';
         return;
       }
 
-      const records = getVisibleHistoryRecords().filter(item => period === 'month'
-        ? getRecordDateKey(item).startsWith(selectedMonth)
-        : getRecordDateKey(item) === selectedDate);
+      const records = getVisibleHistoryRecords().filter(item => {
+        const dateKey = getRecordDateKey(item);
+        return dateKey >= start && dateKey <= end;
+      });
       if (records.length === 0) {
-        exportStatus.textContent = period === 'month' ? 'No records found for that month.' : 'No records found for that date.';
+        exportStatus.textContent = 'No records found in that range.';
         exportStatus.className = 'export-status error';
         return;
       }
@@ -1546,27 +1562,32 @@
         ['Name', 'Email', 'Date and Time', 'Location'],
         ...records.map(item => [item.name, item.email, item.date, normalizeLocation(item.location)])
       ];
-      downloadCsv(`sagility-assessments-${selectedPeriod}.csv`, rows);
+      downloadCsv(`sagility-assessments-${start}-to-${end}.csv`, rows);
       exportStatus.textContent = `${records.length} record(s) exported.`;
       exportStatus.className = 'export-status success';
     }
 
-    function exportNotificationCsv(period = 'day') {
-      const selectedDate = document.getElementById('notificationExportDateInput').value;
-      const selectedMonth = document.getElementById('notificationExportMonthInput').value;
+    function exportNotificationCsv() {
+      const start = document.getElementById('notificationExportDateInput').value;
+      const end = document.getElementById('notificationExportEndInput').value;
       const exportStatus = document.getElementById('notificationExportStatus');
-      const selectedPeriod = period === 'month' ? selectedMonth : selectedDate;
-      if (!selectedPeriod) {
-        exportStatus.textContent = period === 'month' ? 'Choose a month first.' : 'Choose a date first.';
+      if (!start || !end) {
+        exportStatus.textContent = 'Choose a start and end date first.';
+        exportStatus.className = 'export-status error';
+        return;
+      }
+      if (start > end) {
+        exportStatus.textContent = 'The start date must be before the end date.';
         exportStatus.className = 'export-status error';
         return;
       }
 
-      const records = getVisibleNotificationRecords().filter(item => period === 'month'
-        ? getRecordDateKey(item).startsWith(selectedMonth)
-        : getRecordDateKey(item) === selectedDate);
+      const records = getVisibleNotificationRecords().filter(item => {
+        const dateKey = getRecordDateKey(item);
+        return dateKey >= start && dateKey <= end;
+      });
       if (records.length === 0) {
-        exportStatus.textContent = period === 'month' ? 'No notification records found for that month.' : 'No notification records found for that date.';
+        exportStatus.textContent = 'No notification records found in that range.';
         exportStatus.className = 'export-status error';
         return;
       }
@@ -1575,7 +1596,7 @@
         ['Name', 'Email', 'Location', 'Date and Time', 'Status'],
         ...records.map(item => [item.name, item.email, normalizeLocation(item.location), item.date, item.status === 'Done' ? 'Done' : 'No Status'])
       ];
-      downloadCsv(`sagility-notifications-${selectedPeriod}.csv`, rows);
+      downloadCsv(`sagility-notifications-${start}-to-${end}.csv`, rows);
       exportStatus.textContent = `${records.length} notification record(s) exported.`;
       exportStatus.className = 'export-status success';
     }
@@ -1768,10 +1789,8 @@
     document.getElementById('notificationSearchBtn').addEventListener('click', renderReports);
     document.getElementById('weeklyReportMonthInput').addEventListener('change', renderWeeklyAssessmentChart);
 
-    document.getElementById('exportDataBtn').addEventListener('click', () => exportHistoryCsv('day'));
-    document.getElementById('exportMonthBtn').addEventListener('click', () => exportHistoryCsv('month'));
-    document.getElementById('notificationExportDataBtn').addEventListener('click', () => exportNotificationCsv('day'));
-    document.getElementById('notificationExportMonthBtn').addEventListener('click', () => exportNotificationCsv('month'));
+    document.getElementById('exportDataBtn').addEventListener('click', exportHistoryCsv);
+    document.getElementById('notificationExportDataBtn').addEventListener('click', exportNotificationCsv);
 
     document.getElementById('deleteSelectedHistoryBtn').addEventListener('click', async () => {
       const deleteButton = document.getElementById('deleteSelectedHistoryBtn');

@@ -57,5 +57,15 @@ service cloud.firestore {
       allow read, create: if request.auth != null;
       allow update, delete: if false;
     }
+
+    match /sagiNotes/{noteId} {
+      allow read, create: if request.auth != null;
+      allow update: if request.auth != null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'link', 'updatedAt']) &&
+        request.resource.data.title is string &&
+        request.resource.data.link is string &&
+        request.resource.data.updatedAt is int;
+      allow delete: if request.auth != null;
+    }
   }
 }

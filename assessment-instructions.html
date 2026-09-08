@@ -292,10 +292,11 @@
 
     .notification-wait-popup {
       position: fixed;
-      top: 18px;
+      top: 50%;
       left: 50%;
       z-index: 20;
       width: min(calc(100% - 32px), 420px);
+      transform: translate(-50%, -50%) scale(.96);
       padding: 16px 20px;
       border: 1px solid #9aa6ad;
       border-radius: 6px;
@@ -306,12 +307,27 @@
       font-weight: 700;
       line-height: 1.4;
       text-align: center;
-      transform: translate(-50%, -150%);
-      transition: transform .2s ease;
+      transition: opacity .2s ease, transform .2s ease;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .notification-wait-popup.visible {
-      transform: translate(-50%, 0);
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .notification-wait-close {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      border: 0;
+      background: transparent;
+      color: #26343c;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
     }
 
     .instruction-button,
@@ -516,7 +532,10 @@
     </div>
   </header>
 
-  <div class="notification-wait-popup" id="notificationWaitPopup" role="alert" aria-live="assertive"></div>
+  <div class="notification-wait-popup" id="notificationWaitPopup" role="alert" aria-live="assertive">
+    <button class="notification-wait-close" id="notificationWaitClose" type="button" aria-label="Close notification">&times;</button>
+    <div id="notificationWaitMessage"></div>
+  </div>
 
   <main>
     <div class="document-viewer" id="document-viewer" aria-live="polite"></div>
@@ -551,6 +570,8 @@
     const buttons = document.querySelectorAll(".instruction-button");
     let currentPdfPath = "level%201.pdf";
     let resizeTimer;
+    const pdfCache = new Map();
+    let renderRequestId = 0;
     const locationSelect = document.getElementById("location-select");
     const seatSelect = document.getElementById("seat-select");
     const doneAssessmentButton = document.getElementById("done-assessment-button");
@@ -619,15 +640,20 @@
     }
 
     function showNotificationWaitPopup() {
-      notificationWaitPopup.textContent = "Please wait. Your notification is being sent to the Test Admin. Please do not click again.";
+      document.getElementById("notificationWaitMessage").textContent = "Please wait. Your notification is being sent to the Test Admin. Please do not click again.";
       notificationWaitPopup.classList.add("visible");
       window.clearTimeout(notificationPopupTimer);
       notificationPopupTimer = window.setTimeout(() => {
-        notificationWaitPopup.classList.remove("visible");
-        doneAssessmentButton.disabled = false;
-        assistanceButton.disabled = false;
-        notificationActionLocked = false;
-      }, 5000);
+        closeNotificationWaitPopup();
+      }, 10000);
+    }
+
+    function closeNotificationWaitPopup() {
+      window.clearTimeout(notificationPopupTimer);
+      notificationWaitPopup.classList.remove("visible");
+      doneAssessmentButton.disabled = false;
+      assistanceButton.disabled = false;
+      notificationActionLocked = false;
     }
 
     async function handleAssessmentAction(action, button) {
@@ -650,25 +676,43 @@
     assistanceButton.addEventListener("click", () => {
       handleAssessmentAction("Need Assistance", assistanceButton);
     });
+    document.getElementById("notificationWaitClose").addEventListener("click", closeNotificationWaitPopup);
 
     locationSelect.addEventListener("change", saveInstructionState);
     seatSelect.addEventListener("change", saveInstructionState);
 
+    function scheduleIdle(callback) {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(callback, { timeout: 120 });
+      } else {
+        window.setTimeout(callback, 0);
+      }
+    }
+
+    async function getPdfDocument(pdfPath) {
+      if (!pdfCache.has(pdfPath)) {
+        pdfCache.set(pdfPath, pdfjsLib.getDocument(pdfPath).promise);
+      }
+      return pdfCache.get(pdfPath);
+    }
+
     async function renderDocument(pdfPath) {
+      const requestId = ++renderRequestId;
       currentPdfPath = pdfPath;
       documentViewer.replaceChildren();
       documentStatus.textContent = "Loading instructions...";
 
       try {
-        const pdf = await pdfjsLib.getDocument(pdfPath).promise;
-        const pages = [];
-
-        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        const pdf = await getPdfDocument(pdfPath);
+        if (requestId !== renderRequestId) return;
+        const pages = Array.from({ length: pdf.numPages });
+        const renderPage = async pageNumber => {
+          if (requestId !== renderRequestId) return;
           const page = await pdf.getPage(pageNumber);
           const baseViewport = page.getViewport({ scale: 1 });
           const scale = Math.min((documentViewer.clientWidth || 876) / baseViewport.width, 1.5);
           const viewport = page.getViewport({ scale });
-          const outputScale = Math.min(Math.max(window.devicePixelRatio || 1, 2), 4);
+          const outputScale = 4;
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
 
@@ -678,16 +722,28 @@
           canvas.style.width = `${viewport.width}px`;
           canvas.style.height = `${viewport.height}px`;
           canvas.setAttribute("aria-label", `Assessment instruction page ${pageNumber}`);
-          pages.push(canvas);
+          pages[pageNumber - 1] = canvas;
           await page.render({
             canvasContext: context,
             viewport,
             transform: [outputScale, 0, 0, outputScale, 0, 0]
           }).promise;
-        }
+          if (requestId === renderRequestId) {
+            documentViewer.replaceChildren(...pages.filter(Boolean));
+          }
+        };
 
-        documentViewer.replaceChildren(...pages);
+        await renderPage(1);
+        if (requestId !== renderRequestId) return;
         documentStatus.textContent = "";
+        let nextPage = 2;
+        const renderRemainingPages = () => {
+          if (requestId !== renderRequestId || nextPage > pdf.numPages) return;
+          const pageNumber = nextPage;
+          nextPage += 1;
+          renderPage(pageNumber).then(() => scheduleIdle(renderRemainingPages));
+        };
+        scheduleIdle(renderRemainingPages);
       } catch (error) {
         documentStatus.textContent = "The instructions could not be displayed here. Use the link below to open the PDF.";
         console.error(error);
