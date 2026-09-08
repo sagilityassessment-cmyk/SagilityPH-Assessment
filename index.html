@@ -103,6 +103,13 @@
         </svg>
         Notes
       </a>
+      <a href="typing-test/index.html" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+          <path d="M7 9h1M11 9h1M15 9h1M7 13h10"></path>
+        </svg>
+        Typing Test
+      </a>
       <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
         <option value="" disabled hidden selected>Location</option>
         <option value="Iloilo City">Iloilo City</option>
@@ -573,6 +580,28 @@
       <button id="exportDataBtn" class="export-data-btn" type="button">Export CSV</button>
       <p id="exportStatus" class="export-status" role="status" aria-live="polite"></p>
     </div>
+  </section>
+
+  <section id="typingResults" class="card reports-section typing-results-section">
+    <h2>Typing Test Results</h2>
+    <p class="packages-subtitle">Completed typing tests, including retakes, synced across browsers</p>
+    <div class="typing-results-filters">
+      <input id="typingResultsNameFilter" type="search" placeholder="Filter by name" aria-label="Filter typing results by name">
+      <input id="typingResultsSeatFilter" type="search" placeholder="Filter by seat number" aria-label="Filter typing results by seat number">
+    </div>
+    <div class="typing-results-table-wrap">
+      <table class="reports-table typing-results-table">
+        <thead>
+          <tr>
+            <th>No.</th><th>Name</th><th>Seat number</th><th>Date</th><th>Time Finished</th><th>Score (WPM)</th><th>Accuracy</th><th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="typingResultsBody">
+          <tr><td colspan="8">Loading typing test results...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button id="deleteTypingResultsBtn" class="history-delete-selected" type="button" disabled>Delete</button>
   </section>
 
   <section id="weeklyReport" class="card reports-section weekly-report-section">
@@ -2046,6 +2075,111 @@
         input.value = '';
       });
     });
+
+    const typingResultsState = { records: [] };
+    const typingResultsBody = document.getElementById('typingResultsBody');
+    const typingResultsNameFilter = document.getElementById('typingResultsNameFilter');
+    const typingResultsSeatFilter = document.getElementById('typingResultsSeatFilter');
+    const deleteTypingResultsBtn = document.getElementById('deleteTypingResultsBtn');
+    const selectedTypingResultIds = new Set();
+
+    function escapeTypingResult(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[character]);
+    }
+
+    function formatTypingResultDate(value, completedAt) {
+      const dateText = String(value || '');
+      const match = dateText.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) return `${match[2]}/${match[3]}/${match[1]}`;
+      const date = new Date(value || completedAt);
+      return Number.isNaN(date.getTime())
+        ? dateText
+        : date.toLocaleDateString('en-US');
+    }
+
+    function formatTypingResultDuration(value) {
+      return value ? String(value) : '-';
+    }
+
+    function renderTypingResults() {
+      const nameFilter = typingResultsNameFilter.value.trim().toLowerCase();
+      const seatFilter = typingResultsSeatFilter.value.trim().toLowerCase();
+      const records = typingResultsState.records.filter(record => (
+        String(record.name || '').toLowerCase().includes(nameFilter) &&
+        String(record.seatNumber || '').toLowerCase().includes(seatFilter)
+      ));
+
+      typingResultsBody.innerHTML = records.length
+        ? records.map((record, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeTypingResult(record.name)}</td>
+            <td>${escapeTypingResult(record.seatNumber)}</td>
+            <td>${escapeTypingResult(formatTypingResultDate(record.date, record.completedAt))}</td>
+            <td>${escapeTypingResult(formatTypingResultDuration(record.time || record.finishedTime))}</td>
+            <td>${escapeTypingResult(record.score)} WPM</td>
+            <td>${escapeTypingResult(record.accuracy)}%</td>
+            <td><input class="typing-result-checkbox" type="checkbox" data-result-id="${escapeTypingResult(record.id)}" ${selectedTypingResultIds.has(record.id) ? 'checked' : ''} aria-label="Select result for deletion: ${escapeTypingResult(record.name)}"></td>
+          </tr>
+        `).join('')
+        : '<tr><td colspan="8">No typing test results found.</td></tr>';
+
+      typingResultsBody.querySelectorAll('.typing-result-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) selectedTypingResultIds.add(checkbox.dataset.resultId);
+          else selectedTypingResultIds.delete(checkbox.dataset.resultId);
+          updateTypingResultsDeleteControls();
+        });
+      });
+      updateTypingResultsDeleteControls();
+    }
+
+    function updateTypingResultsDeleteControls() {
+      const visibleIds = [...typingResultsBody.querySelectorAll('.typing-result-checkbox')].map(checkbox => checkbox.dataset.resultId);
+      const selectedVisibleCount = visibleIds.filter(id => selectedTypingResultIds.has(id)).length;
+      deleteTypingResultsBtn.disabled = selectedTypingResultIds.size === 0;
+    }
+
+    typingResultsNameFilter.addEventListener('input', renderTypingResults);
+    typingResultsSeatFilter.addEventListener('input', renderTypingResults);
+    deleteTypingResultsBtn.addEventListener('click', async () => {
+      const ids = [...selectedTypingResultIds];
+      if (!ids.length || !window.confirm(`Delete ${ids.length} selected typing result${ids.length === 1 ? '' : 's'}?`)) return;
+      deleteTypingResultsBtn.disabled = true;
+      try {
+        await ensureFirebaseAuth();
+        const batch = firestore.batch();
+        ids.forEach(id => batch.update(firestore.collection('typingResults').doc(id), {
+          deleted: true,
+          deletedAt: Date.now()
+        }));
+        await batch.commit();
+        ids.forEach(id => selectedTypingResultIds.delete(id));
+      } catch (error) {
+        console.error('Typing result delete failed:', error);
+        alert('Unable to delete the selected typing results. Please check the Firestore permissions.');
+        updateTypingResultsDeleteControls();
+      }
+    });
+    ensureFirebaseAuth()
+      .then(() => {
+        firestore.collection('typingResults').onSnapshot(snapshot => {
+          typingResultsState.records = snapshot.docs
+            .map(document => ({ id: document.id, ...document.data() }))
+            .filter(record => !record.deleted)
+            .sort((first, second) => Number(second.completedAt || 0) - Number(first.completedAt || 0));
+          renderTypingResults();
+        }, error => {
+          console.error('Typing results read failed:', error);
+          typingResultsBody.innerHTML = '<tr><td colspan="8">Results unavailable: check Firestore rules.</td></tr>';
+        });
+      })
+      .catch(error => {
+        console.error('Typing results authentication failed:', error);
+        typingResultsBody.innerHTML = '<tr><td colspan="8">Results unavailable: Firebase authentication failed.</td></tr>';
+      });
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
