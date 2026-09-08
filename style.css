@@ -233,15 +233,29 @@ nav a {
   justify-content: flex-start;
 }
 
-.typing-results-filters input {
-  flex: 1 1 220px;
-  min-width: 180px;
-  padding: 10px 12px;
+.card .typing-results-filters input {
+  flex: 0 1 260px;
+  width: 260px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   background: #fff;
   color: var(--text-dark);
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  .card .typing-results-filters {
+    gap: 8px;
+  }
+
+  .card .typing-results-filters input {
+    flex: 1 1 140px;
+    width: 140px;
+    font-size: 12px;
+  }
 }
 
 .typing-results-section {
