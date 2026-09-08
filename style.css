@@ -234,10 +234,10 @@ nav a {
 }
 
 .card .typing-results-filters input {
-  flex: 0 1 260px;
-  width: 260px;
-  max-width: 100%;
-  min-width: 0;
+  flex: 0 0 260px !important;
+  width: 260px !important;
+  max-width: 260px !important;
+  min-width: 0 !important;
   padding: 8px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
@@ -252,8 +252,9 @@ nav a {
   }
 
   .card .typing-results-filters input {
-    flex: 1 1 140px;
-    width: 140px;
+    flex: 1 1 140px !important;
+    width: 140px !important;
+    max-width: 100% !important;
     font-size: 12px;
   }
 }
