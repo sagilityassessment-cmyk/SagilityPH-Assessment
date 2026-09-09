@@ -5,8 +5,6 @@ import {
   remove
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
 
-const SITE = "QC";
-const queuePath = `locations/${SITE}/queue`;
 const popup = document.getElementById("popup");
 const currentCall = document.getElementById("currentCall");
 const callHistory = document.getElementById("callHistory");
@@ -18,6 +16,7 @@ let processing = false;
 let current = null;
 const history = [];
 let selectedVoice = null;
+let stopQueueListener = null;
 const savedLocation = localStorage.getItem("sagility-display-location") || localStorage.getItem("sagility-selected-location") || "";
 if ([...displayLocationSelect.options].some(option => option.value === savedLocation)) {
   displayLocationSelect.value = savedLocation;
@@ -25,9 +24,32 @@ if ([...displayLocationSelect.options].some(option => option.value === savedLoca
 
 displayLocationSelect.addEventListener("change", () => {
   localStorage.setItem("sagility-display-location", displayLocationSelect.value);
-  queueEntries = allQueueEntries.filter(([, call]) => call.location === displayLocationSelect.value);
-  processNextCall();
+  subscribeToLocation();
 });
+
+function getQueuePath() {
+  return `locations/${encodeURIComponent(displayLocationSelect.value)}/queue`;
+}
+
+function subscribeToLocation() {
+  stopQueueListener?.();
+  stopQueueListener = null;
+  queueEntries = [];
+  allQueueEntries = [];
+  current = null;
+  processing = false;
+  popup.classList.add("hidden");
+  drawBoard();
+  if (!displayLocationSelect.value) return;
+
+  stopQueueListener = onValue(ref(db, getQueuePath()), snapshot => {
+    const queue = snapshot.val() || {};
+    allQueueEntries = Object.entries(queue)
+      .sort((first, second) => Number(first[1].timestamp || 0) - Number(second[1].timestamp || 0));
+    queueEntries = allQueueEntries;
+    processNextCall();
+  });
+}
 
 function loadVoice() {
   const voices = speechSynthesis.getVoices();
@@ -90,6 +112,7 @@ async function processNextCall() {
   if (processing || queueEntries.length === 0) return;
   processing = true;
   const [key, call] = queueEntries[0];
+  const queuePath = getQueuePath();
   current = { seat: call.seat, id: String(call.id) };
   history.unshift(current);
   history.splice(12);
@@ -106,14 +129,5 @@ async function processNextCall() {
   }, 10000);
 }
 
-onValue(ref(db, queuePath), snapshot => {
-  const queue = snapshot.val() || {};
-  allQueueEntries = Object.entries(queue)
-    .sort((first, second) => Number(first[1].timestamp || 0) - Number(second[1].timestamp || 0));
-  queueEntries = allQueueEntries
-    .filter(([, call]) => call.location === displayLocationSelect.value)
-    ;
-  processNextCall();
-});
-
 drawBoard();
+subscribeToLocation();

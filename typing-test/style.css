@@ -35,7 +35,7 @@ body {
 .container { background: #fff; padding: 28px 22px 20px; border-radius: 10px; max-width: none; margin: 0; width: 100%; box-shadow: 0 12px 30px rgba(43, 91, 150, 0.14); }
 .container > h1 { text-align: center; margin: 0 0 12px; }
 .right-panel { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: stretch; width: 100%; }
-.displayText { font-size: 25px; line-height: 1.5; margin-bottom: 12px; font-weight: bold; text-align: left; }
+.displayText { display: none; }
 .current { background-color: #fff3bf; border-bottom: 2px solid #0078D4; }
 
 /* Typing shell (overlay + textarea) */
@@ -53,11 +53,22 @@ body {
 .typing-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; color: #000; overflow: hidden; }
 .correct { color: #000; font-weight: 700; }
 .incorrect { color: #d83b01; font-weight: 700; }
+.untyped { color: #aeb7c4; font-weight: 700; }
+.typing-caret {
+  display: inline-block;
+  height: 1.2em;
+  margin-left: -1px;
+  border-left: 2px solid #111;
+  vertical-align: text-bottom;
+  animation: typing-caret-blink 1s step-end infinite;
+}
+@keyframes typing-caret-blink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
 .inline-stats { display: flex; justify-content: space-between; font-size: 20px; color: #333; margin: 10px 4px 6px; }
 .button-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .big-btn { font-size: 20px; padding: 10px 16px; cursor: pointer; }
-#finishedBtn { background: #0078D4; color: #fff; }
-#finishedBtn:hover { background: #106EBE; }
 #retakeBtn { background: #b9e8c5; border: 1px solid #79bd89; color: #174b26; }
 #retakeBtn:hover { background: #a4ddb3; }
 #newApplicantBtn { background: #ffe79a; border: 1px solid #d8b63e; color: #5b4700; }
@@ -108,15 +119,36 @@ body {
   }
 
   .typing-shell {
-    min-height: 220px;
-    height: 220px;
-    overflow-y: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
 
-  .typing-input,
   .typing-overlay {
     font-size: 20px;
     line-height: 1.5;
+  }
+
+  .typing-overlay {
+    position: relative;
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+  }
+
+  .typing-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    z-index: 1;
+    caret-color: transparent;
+  }
+
+  .typing-overlay {
+    z-index: 2;
   }
 
   .inline-stats {

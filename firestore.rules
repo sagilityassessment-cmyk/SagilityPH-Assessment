@@ -81,7 +81,7 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted', 'deletedAt']) &&
         request.resource.data.deleted == true &&
         request.resource.data.deletedAt is int;
-      allow delete: if false;
+      allow delete: if request.auth != null;
     }
   }
 }

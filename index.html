@@ -103,7 +103,7 @@
         </svg>
         Notes
       </a>
-      <a href="typing-test/index.html" target="_blank" rel="noopener noreferrer">
+      <a href="./typing-test/index.html" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <rect x="3" y="5" width="18" height="14" rx="2"></rect>
           <path d="M7 9h1M11 9h1M15 9h1M7 13h10"></path>
@@ -593,7 +593,7 @@
       <table class="reports-table typing-results-table">
         <thead>
           <tr>
-            <th>No.</th><th>Name</th><th>Seat number</th><th>Date</th><th>Time Finished</th><th>Score (WPM)</th><th>Accuracy</th><th>Delete</th>
+            <th>No.</th><th>Name</th><th>Seat number</th><th>Date and Time</th><th>Time Finished</th><th>Score (WPM)</th><th>Accuracy</th><th>Delete</th>
           </tr>
         </thead>
         <tbody id="typingResultsBody">
@@ -2089,7 +2089,18 @@
       })[character]);
     }
 
-    function formatTypingResultDate(value, completedAt) {
+    function formatTypingResultDate(value, completedAt, finishedAt) {
+      const timestampValue = finishedAt || completedAt;
+      const timestamp = typeof timestampValue === 'object' && timestampValue !== null && typeof timestampValue.toMillis === 'function'
+        ? timestampValue.toMillis()
+        : Number(timestampValue);
+      if (timestamp) {
+        const completedDate = new Date(timestamp);
+        if (!Number.isNaN(completedDate.getTime())) {
+          const manilaOptions = { timeZone: 'Asia/Manila' };
+          return `${completedDate.toLocaleDateString('en-US', manilaOptions)}, ${completedDate.toLocaleTimeString('en-US', { ...manilaOptions, hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+        }
+      }
       const dateText = String(value || '');
       const match = dateText.match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if (match) return `${match[2]}/${match[3]}/${match[1]}`;
@@ -2117,7 +2128,7 @@
             <td>${index + 1}</td>
             <td>${escapeTypingResult(record.name)}</td>
             <td>${escapeTypingResult(record.seatNumber)}</td>
-            <td>${escapeTypingResult(formatTypingResultDate(record.date, record.completedAt))}</td>
+            <td>${escapeTypingResult(formatTypingResultDate(record.date, record.completedAt, record.finishedAt))}</td>
             <td>${escapeTypingResult(formatTypingResultDuration(record.time || record.finishedTime))}</td>
             <td>${escapeTypingResult(record.score)} WPM</td>
             <td>${escapeTypingResult(record.accuracy)}%</td>
@@ -2151,10 +2162,7 @@
       try {
         await ensureFirebaseAuth();
         const batch = firestore.batch();
-        ids.forEach(id => batch.update(firestore.collection('typingResults').doc(id), {
-          deleted: true,
-          deletedAt: Date.now()
-        }));
+        ids.forEach(id => batch.delete(firestore.collection('typingResults').doc(id)));
         await batch.commit();
         ids.forEach(id => selectedTypingResultIds.delete(id));
       } catch (error) {
