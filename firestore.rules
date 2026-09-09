@@ -73,6 +73,7 @@ service cloud.firestore {
       allow create: if request.auth != null &&
         request.resource.data.name is string &&
         request.resource.data.seatNumber is string &&
+        request.resource.data.location is string &&
         request.resource.data.date is string &&
         request.resource.data.score is int &&
         request.resource.data.accuracy is int &&

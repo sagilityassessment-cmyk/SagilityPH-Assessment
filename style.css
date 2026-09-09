@@ -246,6 +246,26 @@ nav a {
   text-align: center;
 }
 
+.card .typing-results-filters select {
+  flex: 0 0 260px;
+  width: 260px;
+  max-width: 260px;
+  min-width: 0;
+  padding: 8px 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: #fff;
+  background-image: linear-gradient(45deg, transparent 50%, var(--accent-blue) 50%), linear-gradient(135deg, var(--accent-blue) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 28px;
+  color: var(--text-dark);
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .card .typing-results-filters {
     gap: 8px;
@@ -257,6 +277,13 @@ nav a {
     max-width: 100% !important;
     font-size: 12px;
   }
+
+  .card .typing-results-filters select {
+    flex: 1 1 140px;
+    width: 140px;
+    max-width: 100%;
+    font-size: 12px;
+  }
 }
 
 .typing-results-section {
@@ -266,7 +293,7 @@ nav a {
 .typing-results-table-wrap {
   height: 350px;
   max-height: 350px;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: auto;
   border: 1px solid var(--border-light);
   border-radius: 8px;
@@ -274,10 +301,11 @@ nav a {
 
 .typing-results-table {
   width: 100%;
-  min-width: 820px;
+  min-width: 0;
   margin: 0;
   text-align: center;
   table-layout: fixed;
+  font-size: 11px;
 }
 
 .typing-results-table th,
@@ -339,6 +367,33 @@ nav a {
   z-index: 1;
   background: #dceeff;
 }
+
+/* Keep all nine result columns inside the card without horizontal scrolling. */
+.typing-results-table th,
+.typing-results-table td {
+  min-width: 0 !important;
+  padding: 7px 3px;
+  overflow-wrap: anywhere;
+}
+
+.typing-results-table th:nth-child(1),
+.typing-results-table td:nth-child(1) { width: 4%; }
+.typing-results-table th:nth-child(2),
+.typing-results-table td:nth-child(2) { width: 17%; }
+.typing-results-table th:nth-child(3),
+.typing-results-table td:nth-child(3) { width: 12%; }
+.typing-results-table th:nth-child(4),
+.typing-results-table td:nth-child(4) { width: 10%; }
+.typing-results-table th:nth-child(5),
+.typing-results-table td:nth-child(5) { width: 17%; }
+.typing-results-table th:nth-child(6),
+.typing-results-table td:nth-child(6) { width: 11%; }
+.typing-results-table th:nth-child(7),
+.typing-results-table td:nth-child(7) { width: 11%; }
+.typing-results-table th:nth-child(8),
+.typing-results-table td:nth-child(8) { width: 11%; }
+.typing-results-table th:nth-child(9),
+.typing-results-table td:nth-child(9) { width: 7%; }
 
 nav a svg {
   width: 14px;

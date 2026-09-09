@@ -588,16 +588,23 @@
     <div class="typing-results-filters">
       <input id="typingResultsNameFilter" type="search" placeholder="Filter by name" aria-label="Filter typing results by name">
       <input id="typingResultsSeatFilter" type="search" placeholder="Filter by seat number" aria-label="Filter typing results by seat number">
+      <select id="typingResultsLocationFilter" aria-label="Filter typing results by location">
+        <option value="">All locations</option>
+        <option value="Iloilo City">Iloilo City</option>
+        <option value="Quezon City">Quezon City</option>
+        <option value="Alabang">Alabang</option>
+        <option value="Bohol">Bohol</option>
+      </select>
     </div>
     <div class="typing-results-table-wrap">
       <table class="reports-table typing-results-table">
         <thead>
           <tr>
-            <th>No.</th><th>Name</th><th>Seat number</th><th>Date and Time</th><th>Time Finished</th><th>Score (WPM)</th><th>Accuracy</th><th>Delete</th>
+            <th>No.</th><th>Name</th><th>Location</th><th>Seat number</th><th>Date and Time</th><th>Time Finished</th><th>Score (WPM)</th><th>Accuracy</th><th>Delete</th>
           </tr>
         </thead>
         <tbody id="typingResultsBody">
-          <tr><td colspan="8">Loading typing test results...</td></tr>
+          <tr><td colspan="9">Loading typing test results...</td></tr>
         </tbody>
       </table>
     </div>
@@ -2080,6 +2087,7 @@
     const typingResultsBody = document.getElementById('typingResultsBody');
     const typingResultsNameFilter = document.getElementById('typingResultsNameFilter');
     const typingResultsSeatFilter = document.getElementById('typingResultsSeatFilter');
+    const typingResultsLocationFilter = document.getElementById('typingResultsLocationFilter');
     const deleteTypingResultsBtn = document.getElementById('deleteTypingResultsBtn');
     const selectedTypingResultIds = new Set();
 
@@ -2117,9 +2125,11 @@
     function renderTypingResults() {
       const nameFilter = typingResultsNameFilter.value.trim().toLowerCase();
       const seatFilter = typingResultsSeatFilter.value.trim().toLowerCase();
+      const locationFilter = typingResultsLocationFilter.value.trim().toLowerCase();
       const records = typingResultsState.records.filter(record => (
         String(record.name || '').toLowerCase().includes(nameFilter) &&
-        String(record.seatNumber || '').toLowerCase().includes(seatFilter)
+        String(record.seatNumber || '').toLowerCase().includes(seatFilter) &&
+        String(record.location || '').toLowerCase().includes(locationFilter)
       ));
 
       typingResultsBody.innerHTML = records.length
@@ -2127,6 +2137,7 @@
           <tr>
             <td>${index + 1}</td>
             <td>${escapeTypingResult(record.name)}</td>
+            <td>${escapeTypingResult(record.location || '-')}</td>
             <td>${escapeTypingResult(record.seatNumber)}</td>
             <td>${escapeTypingResult(formatTypingResultDate(record.date, record.completedAt, record.finishedAt))}</td>
             <td>${escapeTypingResult(formatTypingResultDuration(record.time || record.finishedTime))}</td>
@@ -2135,7 +2146,7 @@
             <td><input class="typing-result-checkbox" type="checkbox" data-result-id="${escapeTypingResult(record.id)}" ${selectedTypingResultIds.has(record.id) ? 'checked' : ''} aria-label="Select result for deletion: ${escapeTypingResult(record.name)}"></td>
           </tr>
         `).join('')
-        : '<tr><td colspan="8">No typing test results found.</td></tr>';
+        : '<tr><td colspan="9">No typing test results found.</td></tr>';
 
       typingResultsBody.querySelectorAll('.typing-result-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', () => {
@@ -2155,6 +2166,7 @@
 
     typingResultsNameFilter.addEventListener('input', renderTypingResults);
     typingResultsSeatFilter.addEventListener('input', renderTypingResults);
+    typingResultsLocationFilter.addEventListener('input', renderTypingResults);
     deleteTypingResultsBtn.addEventListener('click', async () => {
       const ids = [...selectedTypingResultIds];
       if (!ids.length || !window.confirm(`Delete ${ids.length} selected typing result${ids.length === 1 ? '' : 's'}?`)) return;
@@ -2181,12 +2193,12 @@
           renderTypingResults();
         }, error => {
           console.error('Typing results read failed:', error);
-          typingResultsBody.innerHTML = '<tr><td colspan="8">Results unavailable: check Firestore rules.</td></tr>';
+          typingResultsBody.innerHTML = '<tr><td colspan="9">Results unavailable: check Firestore rules.</td></tr>';
         });
       })
       .catch(error => {
         console.error('Typing results authentication failed:', error);
-        typingResultsBody.innerHTML = '<tr><td colspan="8">Results unavailable: Firebase authentication failed.</td></tr>';
+        typingResultsBody.innerHTML = '<tr><td colspan="9">Results unavailable: Firebase authentication failed.</td></tr>';
       });
 
     // Initialize on page load

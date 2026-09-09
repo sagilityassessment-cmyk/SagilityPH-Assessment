@@ -127,7 +127,7 @@ function renderDisplayFollowingCaret(){ const pos = typedTextRaw.length; if(pos>
 
 function calculateStats(){ if(!startTime){ wpmEl.textContent='0'; accuracyEl.textContent='0%'; return; } const words = typedTextRaw.trim().split(/\s+/).filter(Boolean).length; const minutes=(Date.now()-startTime)/60000; const wpm = minutes>0?Math.round(words/minutes):0; let correct=0; const len=Math.min(typedTextRaw.length, displayText.length); for(let i=0;i<len;i++) if(typedTextRaw[i]===displayText[i]) correct++; const acc = displayText.length?Math.round((correct/displayText.length)*100):0; wpmEl.textContent=String(wpm); accuracyEl.textContent=String(acc); }
 
-function finishTest(){ if(!startTime) startTime=Date.now(); testCompleted=true; clearInterval(timerInterval); typingShell.classList.add('locked'); typingInput.readOnly=true; rTime.textContent=timeEl.textContent; rWpm.textContent=wpmEl.textContent; rAcc.textContent=`${accuracyEl.textContent}%`.replace('%%','%'); downloadBtn.classList.remove('hidden'); const completedAt=Date.now(); const item={ name: localStorage.getItem('fullName'), seatNumber: localStorage.getItem('seatNumber'), date: localStorage.getItem('date'), finishedAt: completedAt, finishedTime: rTime.textContent, time: rTime.textContent, wpm: rWpm.textContent, accuracy: accuracyEl.textContent }; saveHistory(item); prependHistoryItem(item); saveSharedResult(item).catch(error => { console.error('Unable to save typing result:', error); alert('The typing result could not be synced. Please try again while connected to the internet.'); }); }
+function finishTest(){ if(!startTime) startTime=Date.now(); testCompleted=true; clearInterval(timerInterval); typingShell.classList.add('locked'); typingInput.readOnly=true; rTime.textContent=timeEl.textContent; rWpm.textContent=wpmEl.textContent; rAcc.textContent=`${accuracyEl.textContent}%`.replace('%%','%'); downloadBtn.classList.remove('hidden'); const completedAt=Date.now(); const item={ name: localStorage.getItem('fullName'), location: localStorage.getItem('location'), seatNumber: localStorage.getItem('seatNumber'), date: localStorage.getItem('date'), finishedAt: completedAt, finishedTime: rTime.textContent, time: rTime.textContent, wpm: rWpm.textContent, accuracy: accuracyEl.textContent }; saveHistory(item); prependHistoryItem(item); saveSharedResult(item).catch(error => { console.error('Unable to save typing result:', error); alert('The typing result could not be synced. Please try again while connected to the internet.'); }); }
 
 function saveHistory(item){ const h=JSON.parse(localStorage.getItem('typingHistory'))||[]; h.push(item); localStorage.setItem('typingHistory', JSON.stringify(h)); }
 async function saveSharedResult(item){
@@ -135,6 +135,7 @@ async function saveSharedResult(item){
     await window.typingAuthReady;
     await window.typingFirestore.collection('typingResults').add({
         name: item.name,
+        location: item.location,
         seatNumber: String(item.seatNumber),
         date: item.date,
         finishedAt: item.finishedAt,
@@ -149,7 +150,7 @@ function formatHistoryDate(value){ const match=String(value||'').match(/^(\d{4})
 function loadHistoryForCurrentApplicant(){ historyList.innerHTML=''; const h=JSON.parse(localStorage.getItem('typingHistory'))||[]; const n=localStorage.getItem('fullName'); const d=localStorage.getItem('date'); h.filter(x=>x.name===n && x.date===d).reverse().forEach(prependHistoryItem); }
 function prependHistoryItem(item){
     const row = document.createElement('tr');
-    ['', item.name, item.seatNumber || '-', formatHistoryDate(item.date), item.time, item.wpm, `${item.accuracy}%`].forEach(value => {
+    ['', item.name, item.location || '-', item.seatNumber || '-', formatHistoryDate(item.date), item.time, item.wpm, `${item.accuracy}%`].forEach(value => {
         const cell = document.createElement('td');
         cell.textContent = value;
         row.appendChild(cell);
@@ -161,7 +162,7 @@ function prependHistoryItem(item){
 }
 
 retakeBtn.addEventListener('click', ()=>{ typedTextRaw=''; typingInput.value=''; renderOverlay(); typingShell.classList.remove('locked'); typingInput.readOnly=false; testCompleted=false; startTime=null; timeEl.textContent='0s'; wpmEl.textContent='0'; accuracyEl.textContent='0%'; displayTextEl.innerText=displayText; downloadBtn.classList.add('hidden'); typingInput.focus(); });
-newApplicantBtn.addEventListener('click', ()=>{ localStorage.removeItem('fullName'); localStorage.removeItem('seatNumber'); localStorage.removeItem('date'); window.location.href='login.html'; });
+newApplicantBtn.addEventListener('click', ()=>{ localStorage.removeItem('fullName'); localStorage.removeItem('location'); localStorage.removeItem('seatNumber'); localStorage.removeItem('date'); window.location.href='login.html'; });
 
 const { jsPDF } = window.jspdf; downloadBtn.addEventListener('click', ()=>{ const doc = new jsPDF(); const name=localStorage.getItem('fullName'); const date=localStorage.getItem('date'); const time=timeEl.textContent; const wpm=wpmEl.textContent; const acc=accuracyEl.textContent; doc.setFontSize(16); doc.text('Typing Test Result',20,20); doc.text(`Name: ${name}`,20,40); doc.text(`Date: ${date}`,20,50); doc.text(`Time Taken: ${time}`,20,60); doc.text(`WPM: ${wpm}`,20,70); doc.text(`Accuracy: ${acc}%`,20,80); doc.text('Typed Text:',20,100); doc.setFontSize(12); doc.text(typedTextRaw,20,110,{maxWidth:170}); doc.save('TypingTestResult.pdf'); });
 

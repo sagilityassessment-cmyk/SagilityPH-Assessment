@@ -59,7 +59,7 @@
         <div class="history-table-wrap">
           <table class="history-table">
             <thead>
-              <tr><th>No.</th><th>Name</th><th>Seat</th><th>Date</th><th>Time</th><th>WPM</th><th>Accuracy</th></tr>
+              <tr><th>No.</th><th>Name</th><th>Location</th><th>Seat</th><th>Date</th><th>Time</th><th>WPM</th><th>Accuracy</th></tr>
             </thead>
             <tbody id="historyList"></tbody>
           </table>
@@ -74,7 +74,7 @@
     (function(){
       const name = localStorage.getItem('fullName');
       const seatNumber = localStorage.getItem('seatNumber');
-      if(!name || !seatNumber){ window.location.replace('login.html'); }
+      if(!name || !seatNumber || !localStorage.getItem('location')){ window.location.replace('login.html'); }
     })();
   </script>
 </body>
