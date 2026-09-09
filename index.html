@@ -103,7 +103,7 @@
         </svg>
         Notes
       </a>
-      <a href="./typing-test/index.html" target="_blank" rel="noopener noreferrer">
+      <a id="typingTestLink" href="./typing-test/index.html" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <rect x="3" y="5" width="18" height="14" rx="2"></rect>
           <path d="M7 9h1M11 9h1M15 9h1M7 13h10"></path>
@@ -724,6 +724,7 @@
     headerLocationSelect.addEventListener('change', () => {
       localStorage.setItem(LOCATION_STORAGE_KEY, headerLocationSelect.value);
       locationInput.value = headerLocationSelect.value;
+      updateTypingTestLink();
       locationInput.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
@@ -732,7 +733,18 @@
       if (locationInput.value) {
         localStorage.setItem(LOCATION_STORAGE_KEY, locationInput.value);
       }
+      updateTypingTestLink();
     });
+
+    function updateTypingTestLink() {
+      const typingTestLink = document.getElementById('typingTestLink');
+      if (!typingTestLink) return;
+      const location = headerLocationSelect.value;
+      typingTestLink.href = location
+        ? `./typing-test/index.html?location=${encodeURIComponent(location)}`
+        : './typing-test/index.html';
+    }
+    updateTypingTestLink();
 
     // Paste your deployed Google Apps Script Web app URL here.
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBgHVtTwGcI5Wk2261KJicHaYYqcENG3QzYJCnjnIHr9HHilIkMzo28zK3qruMlvZQxQ/exec';

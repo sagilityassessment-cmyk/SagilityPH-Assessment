@@ -38,6 +38,14 @@
   </div>
   <script>
     const seatNumberSelect = document.getElementById('seatNumber');
+    const locationSelect = document.getElementById('location');
+    const locationFromPortal = new URLSearchParams(window.location.search).get('location');
+    const savedLocation = localStorage.getItem('location');
+    if ([...locationSelect.options].some(option => option.value === locationFromPortal)) {
+      locationSelect.value = locationFromPortal;
+    } else if ([...locationSelect.options].some(option => option.value === savedLocation)) {
+      locationSelect.value = savedLocation;
+    }
     for (let seat = 1; seat <= 30; seat += 1) {
       const option = document.createElement('option');
       option.value = String(seat);
@@ -47,7 +55,7 @@
 
     document.getElementById('startTestBtn').addEventListener('click', function(){
       const name = document.getElementById('fullName').value.trim();
-      const location = document.getElementById('location').value;
+      const location = locationSelect.value;
       const seatNumber = document.getElementById('seatNumber').value;
       if(!name || !location || !seatNumber){ return; }
       localStorage.setItem('fullName', name);
