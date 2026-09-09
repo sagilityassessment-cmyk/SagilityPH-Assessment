@@ -216,7 +216,7 @@
           </svg>
           <h2>Data Delivery History</h2>
         </div>
-        <input id="recentHistorySearchInput" class="history-search-input" type="search" placeholder="Search recent name, email, or location">
+        <input id="recentHistorySearchInput" class="history-search-input" type="search" placeholder="Search name, email, or location">
         <ol id="recentSentHistoryList" class="sent-history-list"></ol>
         <button id="deleteRecentHistoryBtn" class="history-delete-selected" type="button" disabled>Delete</button>
       </section>
@@ -556,7 +556,7 @@
 
   <section id="reports" class="card reports-section">
     <h2>Reports</h2>
-    <p class="packages-subtitle">Assessment count by location</p>
+    <p class="packages-subtitle">All recorded assessments by location</p>
     <div class="reports-content">
       <table class="reports-table">
         <thead>
@@ -629,7 +629,7 @@
     <div class="notification-report-heading">
       <div>
         <h2>Candidates Report Status</h2>
-        <p class="packages-subtitle">Candidate completion status by location</p>
+        <p class="packages-subtitle">All recorded candidate statuses by location</p>
       </div>
       <div class="notification-report-actions">
       </div>
@@ -1207,15 +1207,8 @@
     }
 
     function getLatestNotificationRecords() {
-      const seen = new Set();
       return getVisibleNotificationRecords()
-        .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0))
-        .filter(item => {
-          const key = `${String(item.name || '').toLowerCase()}|${String(item.email || '').toLowerCase()}|${normalizeLocation(item.location)}`;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
+        .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0));
     }
 
     function getWeeklyReportMonth() {
@@ -1403,15 +1396,13 @@
     function renderRecentSentHistory(searchTerm = '') {
       const search = searchTerm.trim().toLowerCase();
       const recentList = document.getElementById('recentSentHistoryList');
-      const cutoff = Date.now() - (48 * 60 * 60 * 1000);
       const records = getVisibleHistoryRecords()
-        .filter(item => Number(item.timestamp || 0) >= cutoff)
         .filter(item => !search || `${item.name || ''} ${item.email || ''} ${item.location || ''}`.toLowerCase().includes(search))
         .sort((first, second) => Number(second.timestamp || 0) - Number(first.timestamp || 0));
 
       recentList.innerHTML = records.length
         ? records.map(item => `<li class="history-item recent-history-row"><input type="checkbox" class="recent-history-delete-checkbox" data-record-id="${escapeHtml(item.recordId || '')}" aria-label="Select ${escapeHtml(item.name || 'record')} for deletion"><span class="history-item-text">${escapeHtml(item.date || '')} - ${escapeHtml(item.name || '')} - ${escapeHtml(item.email || '')} - ${escapeHtml(item.location || '')}</span></li>`).join('')
-        : `<li class="sent-history-empty">${search ? 'No matching recent assessments' : 'No sent assessments in the last 48 hours'}</li>`;
+        : `<li class="sent-history-empty">${search ? 'No matching assessments' : 'No sent assessments recorded'}</li>`;
 
       recentList.querySelectorAll('.recent-history-delete-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', updateRecentDeleteButtonState);
@@ -1442,12 +1433,8 @@
         'Bohol': 0
       };
       const statusCounts = Object.fromEntries(Object.keys(notificationCounts).map(location => [location, { 'No Status': 0, Done: 0 }]));
-      const countedEmails = new Set();
       getVisibleHistoryRecords()
         .forEach(item => {
-          const email = String(item.email || '').trim().toLowerCase();
-          if (!email || countedEmails.has(email)) return;
-          countedEmails.add(email);
           const location = normalizeLocation(item.location);
           if (counts[location] !== undefined) {
             counts[location] += 1;
@@ -1465,7 +1452,7 @@
         });
 
       const locations = Object.keys(counts);
-      const totalCount = countedEmails.size;
+      const totalCount = getVisibleHistoryRecords().length;
       const maxCount = Math.max(...locations.map(location => counts[location]), 1);
       locations.forEach(location => {
         const countCellId = `reportCount-${location.toLowerCase().replaceAll(' ', '-')}`;
@@ -1562,7 +1549,7 @@
             <div class="report-bar-track"><div class="report-bar bar-${index % 6}" style="width: ${(counts[location] / maxCount) * 100}%"></div></div>
             <strong>${counts[location]}</strong>
           </div>`).join('')
-        : '<p class="report-empty">No assessments today</p>';
+        : '<p class="report-empty">No assessments recorded</p>';
     }
 
     function csvValue(value) {
