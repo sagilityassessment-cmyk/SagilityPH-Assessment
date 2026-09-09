@@ -725,6 +725,25 @@
     </div>
   </section>
 
+  <section id="monthlyReports" class="card monthly-reports-section">
+    <div class="monthly-reports-heading">
+      <div>
+        <h2>Monthly Reports</h2>
+        <p class="packages-subtitle">Saved report snapshots</p>
+      </div>
+    </div>
+    <div class="monthly-reports-grid">
+      <a class="monthly-report-card" href="MOTHLY%20REPORT.png" target="_blank" rel="noopener">
+        <img src="MOTHLY%20REPORT.png" alt="Monthly report">
+        <strong>Monthly Report</strong>
+      </a>
+      <a class="monthly-report-card" href="MONTHLY%20TABLE%20DASHBOARD.png" target="_blank" rel="noopener">
+        <img src="MONTHLY%20TABLE%20DASHBOARD.png" alt="Monthly table dashboard">
+        <strong>Monthly Table Dashboard</strong>
+      </a>
+    </div>
+  </section>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -1869,10 +1888,7 @@
       try {
         await firebaseAuthReady;
         const batch = firestore.batch();
-        ids.forEach(id => batch.update(firestore.collection('sentHistory').doc(id), {
-          deleted: true,
-          deletedAt: Date.now()
-        }));
+        ids.forEach(id => batch.delete(firestore.collection('sentHistory').doc(id)));
         await batch.commit();
 
         const deletedIds = new Set(ids);
@@ -1906,10 +1922,7 @@
       try {
         await firebaseAuthReady;
         const batch = firestore.batch();
-        ids.forEach(id => batch.update(firestore.collection('sentHistory').doc(id), {
-          deleted: true,
-          deletedAt: Date.now()
-        }));
+        ids.forEach(id => batch.delete(firestore.collection('sentHistory').doc(id)));
         await batch.commit();
         const deletedIds = new Set(ids);
         sentHistoryRecords = sentHistoryRecords.filter(record => !deletedIds.has(record.recordId));
@@ -1942,10 +1955,7 @@
       try {
         await firebaseAuthReady;
         const batch = firestore.batch();
-        ids.forEach(id => batch.update(firestore.collection('sentHistory').doc(id), {
-          deleted: true,
-          deletedAt: Date.now()
-        }));
+        ids.forEach(id => batch.delete(firestore.collection('sentHistory').doc(id)));
         await batch.commit();
 
         const deletedIds = new Set(ids);

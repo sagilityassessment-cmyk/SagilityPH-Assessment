@@ -27,7 +27,7 @@ service cloud.firestore {
         )
       );
 
-      allow delete: if false;
+      allow delete: if request.auth != null;
     }
 
     match /notificationHistory/{recordId} {
@@ -50,7 +50,7 @@ service cloud.firestore {
         )
       );
 
-      allow delete: if false;
+      allow delete: if request.auth != null;
     }
 
     match /assessmentAudioNotifications/{notificationId} {
