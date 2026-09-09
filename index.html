@@ -110,14 +110,17 @@
         </svg>
         Typing Test
       </a>
-      <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
-        <option value="" disabled hidden selected>Location</option>
-        <option value="Iloilo City">Iloilo City</option>
-        <option value="Bohol">Bohol</option>
-        <option value="Alabang">Alabang</option>
-        <option value="Quezon City">Quezon City</option>
-        <option value="Testing">Testing</option>
-      </select>
+      <div class="location-control-wrap">
+        <div id="locationReminderBubble" class="typing-chart-hint location-reminder-bubble" role="status">Please note: choose your location</div>
+        <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
+          <option value="" disabled hidden selected>Location</option>
+          <option value="Iloilo City">Iloilo City</option>
+          <option value="Bohol">Bohol</option>
+          <option value="Alabang">Alabang</option>
+          <option value="Quezon City">Quezon City</option>
+          <option value="Testing">Testing</option>
+        </select>
+      </div>
     </nav>
   </header>
 
@@ -616,6 +619,11 @@
       </table>
     </div>
     <button id="deleteTypingResultsBtn" class="history-delete-selected" type="button" disabled>Delete</button>
+    <div class="typing-chart-toggle-wrap">
+      <div id="typingChartHint" class="typing-chart-hint" role="status">Click to show report graph</div>
+      <button id="toggleTypingResultsChartBtn" class="typing-chart-toggle" type="button" aria-expanded="false" aria-controls="typingResultsChart">Show graph</button>
+    </div>
+    <div id="typingResultsChart" class="typing-results-chart is-collapsed" aria-label="Typing test results by WPM range and location"></div>
   </section>
 
   <section id="weeklyReport" class="card reports-section weekly-report-section">
@@ -724,11 +732,15 @@
     const headerLocationSelect = document.getElementById('headerLocationSelect');
     const locationInput = document.getElementById('locationInput');
     const LOCATION_STORAGE_KEY = 'sagility-selected-location';
+    const locationReminderBubble = document.getElementById('locationReminderBubble');
     const savedLocation = localStorage.getItem(LOCATION_STORAGE_KEY) || '';
     headerLocationSelect.value = savedLocation;
     locationInput.value = savedLocation;
+    window.setTimeout(() => locationReminderBubble.classList.add('is-visible'), 350);
+    window.setTimeout(() => locationReminderBubble.classList.remove('is-visible'), 5000);
 
     headerLocationSelect.addEventListener('change', () => {
+      locationReminderBubble.classList.remove('is-visible');
       localStorage.setItem(LOCATION_STORAGE_KEY, headerLocationSelect.value);
       locationInput.value = headerLocationSelect.value;
       updateTypingTestLink();
@@ -2149,8 +2161,28 @@
     const typingResultsNameFilter = document.getElementById('typingResultsNameFilter');
     const typingResultsSeatFilter = document.getElementById('typingResultsSeatFilter');
     const typingResultsLocationFilter = document.getElementById('typingResultsLocationFilter');
+    const typingResultsChart = document.getElementById('typingResultsChart');
+    const toggleTypingResultsChartBtn = document.getElementById('toggleTypingResultsChartBtn');
+    const typingChartHint = document.getElementById('typingChartHint');
     const deleteTypingResultsBtn = document.getElementById('deleteTypingResultsBtn');
     const selectedTypingResultIds = new Set();
+
+    toggleTypingResultsChartBtn.addEventListener('click', () => {
+      const isCollapsed = typingResultsChart.classList.toggle('is-collapsed');
+      toggleTypingResultsChartBtn.setAttribute('aria-expanded', String(!isCollapsed));
+      toggleTypingResultsChartBtn.textContent = isCollapsed ? 'Show graph' : 'Hide graph';
+      typingChartHint.classList.remove('is-visible');
+    });
+
+    let typingChartHintTimer;
+    const typingChartHintObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        typingChartHint.classList.add('is-visible');
+        window.clearTimeout(typingChartHintTimer);
+        typingChartHintTimer = window.setTimeout(() => typingChartHint.classList.remove('is-visible'), 4500);
+      }
+    }, { threshold: 0.8 });
+    typingChartHintObserver.observe(toggleTypingResultsChartBtn);
 
     function escapeTypingResult(value) {
       return String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -2183,6 +2215,60 @@
       return value ? String(value) : '-';
     }
 
+    function renderTypingResultsChart(records) {
+      if (!typingResultsChart) return;
+      const ranges = [
+        { label: '0-19', test: score => score < 20 },
+        { label: '20-29', test: score => score >= 20 && score < 30 },
+        { label: '30-39', test: score => score >= 30 && score < 40 },
+        { label: '40-49', test: score => score >= 40 && score < 50 },
+        { label: '50+', test: score => score >= 50 }
+      ];
+      const locations = [...new Set(records.map(record => String(record.location || 'Unknown')))].sort();
+      if (!records.length || !locations.length) {
+        typingResultsChart.innerHTML = '<p class="report-empty">No typing test data for this filter.</p>';
+        return;
+      }
+
+      const width = 1400;
+      const height = 220;
+      const left = 38;
+      const right = 10;
+      const top = 20;
+      const bottom = 42;
+      const plotWidth = width - left - right;
+      const plotHeight = height - top - bottom;
+      const series = locations.map(location => ({
+        location,
+        values: ranges.map(range => records.filter(record => (
+          String(record.location || 'Unknown') === location && range.test(Number(record.score) || 0)
+        )).length)
+      }));
+      const maxCount = Math.max(...series.flatMap(item => item.values), 1);
+      const xStep = ranges.length > 1 ? plotWidth / (ranges.length - 1) : plotWidth;
+      const locationColors = {
+        'Alabang': '#e56b9f',
+        'Bohol': '#e5b83f',
+        'Iloilo City': '#27a66f',
+        'Quezon City': '#4d7cff'
+      };
+      const fallbackColors = ['#7b61a8', '#168c9c'];
+      const yFor = value => top + plotHeight - (value / maxCount) * plotHeight;
+      const gridLines = [0, 0.5, 1].map(ratio => {
+        const y = yFor(Math.round(maxCount * ratio));
+        return `<line x1="${left}" y1="${y}" x2="${width - right}" y2="${y}" class="typing-chart-grid-line"></line><text x="${left - 8}" y="${y + 4}" class="typing-chart-axis-label" text-anchor="end">${Math.round(maxCount * ratio)}</text>`;
+      }).join('');
+      const labels = ranges.map((range, index) => `<text x="${left + index * xStep}" y="${height - 20}" class="typing-chart-axis-label" text-anchor="middle">${range.label}</text>`).join('');
+      const lines = series.map((item, seriesIndex) => {
+        const color = locationColors[item.location] || fallbackColors[seriesIndex % fallbackColors.length];
+        const points = item.values.map((value, index) => `${left + index * xStep},${yFor(value)}`).join(' ');
+        const dots = item.values.map((value, index) => `<circle cx="${left + index * xStep}" cy="${yFor(value)}" r="4" fill="#fff" stroke="${color}" stroke-width="2"><title>${escapeTypingResult(item.location)}, ${ranges[index].label} WPM: ${value}</title></circle>`).join('');
+        return `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>${dots}`;
+      }).join('');
+      const legend = series.map((item, index) => `<span><i class="typing-chart-legend-swatch" style="background:${locationColors[item.location] || fallbackColors[index % fallbackColors.length]}"></i>${escapeTypingResult(item.location)}</span>`).join('');
+      typingResultsChart.innerHTML = `<div class="typing-chart-title">Completed tests by WPM range</div><div class="typing-chart-legend">${legend}</div><div class="typing-chart-scroll"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Completed typing tests grouped by WPM range for each location"><g>${gridLines}</g>${lines}${labels}</svg></div>`;
+    }
+
     function renderTypingResults() {
       const nameFilter = typingResultsNameFilter.value.trim().toLowerCase();
       const seatFilter = typingResultsSeatFilter.value.trim().toLowerCase();
@@ -2208,6 +2294,7 @@
           </tr>
         `).join('')
         : '<tr><td colspan="9">No typing test results found.</td></tr>';
+      renderTypingResultsChart(records);
 
       typingResultsBody.querySelectorAll('.typing-result-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', () => {

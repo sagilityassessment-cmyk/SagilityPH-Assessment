@@ -368,6 +368,150 @@ nav a {
   background: #dceeff;
 }
 
+.typing-results-chart {
+  width: calc(100% + 56px);
+  margin: 18px -28px 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+  color: var(--primary-blue);
+}
+
+.typing-chart-toggle {
+  width: auto;
+  margin: 10px 0 0;
+  padding: 7px 12px;
+  border: 1px solid var(--accent-blue);
+  border-radius: 6px;
+  background: #edf5ff;
+  color: var(--primary-blue);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.typing-chart-toggle-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  margin-top: 4px;
+}
+
+.typing-chart-hint {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  width: max-content;
+  max-width: 230px;
+  padding: 9px 13px;
+  border: 1px solid #a9d9f5;
+  border-radius: 14px 14px 14px 4px;
+  background: #e5f6ff;
+  color: #17618c;
+  box-shadow: 0 8px 18px rgba(65, 156, 207, 0.2);
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.typing-chart-hint::after,
+.typing-chart-hint::before {
+  position: absolute;
+  content: '';
+  border-radius: 50%;
+  background: #b9e5fa;
+}
+
+.typing-chart-hint::before {
+  width: 7px;
+  height: 7px;
+  left: 8px;
+  bottom: -10px;
+}
+
+.typing-chart-hint::after {
+  width: 4px;
+  height: 4px;
+  left: 1px;
+  bottom: -16px;
+}
+
+.typing-chart-hint.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.typing-chart-toggle:hover {
+  background: #dceeff;
+}
+
+.typing-results-chart.is-collapsed {
+  display: none;
+}
+
+.typing-chart-title {
+  margin: 0 28px 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.typing-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 28px 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.typing-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typing-chart-legend-swatch {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.typing-chart-scroll {
+  width: 100%;
+  overflow: hidden;
+}
+
+.typing-chart-scroll svg {
+  display: block;
+  width: 100%;
+  height: 220px;
+}
+
+.typing-chart-grid-line {
+  stroke: #d8e2ef;
+  stroke-width: 1;
+}
+
+.typing-chart-axis-label {
+  fill: var(--text-secondary);
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .typing-results-chart {
+    width: calc(100% + 40px);
+    margin-left: -20px;
+    margin-right: -20px;
+  }
+
+  .typing-chart-title,
+  .typing-chart-legend {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
 /* Keep all nine result columns inside the card without horizontal scrolling. */
 .typing-results-table th,
 .typing-results-table td {
@@ -434,6 +578,37 @@ nav a[href*="assessment-instructions"] {
 
 .header-location-select:invalid {
   color: #8a969e;
+}
+
+.location-control-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.location-reminder-bubble {
+  top: calc(100% + 10px);
+  bottom: auto;
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, -6px) scale(0.96);
+}
+
+.location-reminder-bubble::before {
+  top: -10px;
+  right: 18px;
+  bottom: auto;
+  left: auto;
+}
+
+.location-reminder-bubble::after {
+  top: -16px;
+  right: 10px;
+  bottom: auto;
+  left: auto;
+}
+
+.location-reminder-bubble.is-visible {
+  transform: translate(-50%, 0) scale(1);
 }
 
 /* ===== HERO SECTION ===== */
@@ -2314,7 +2489,7 @@ button {
   font-family: inherit;
 }
 
-button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.notes-add-button):not(.notes-click-button):not(.notes-save-button):not(.notes-delete-button) {
+button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.notes-add-button):not(.notes-click-button):not(.notes-save-button):not(.notes-delete-button):not(.typing-chart-toggle) {
   width: 100%;
   padding: 16px 20px;
   border: none;
