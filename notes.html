@@ -14,6 +14,8 @@
     }
 
     .notes-shell {
+      position: relative;
+      z-index: 1;
       width: min(calc(100% - 24px), 1400px);
       max-height: calc(100vh - 24px);
       box-sizing: border-box;
@@ -21,7 +23,7 @@
       padding: 28px;
       border: 1px solid rgba(129, 176, 220, 0.42);
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.82);
+      background: #fff;
       box-shadow: var(--shadow-medium);
       overflow: hidden;
     }
@@ -44,6 +46,19 @@
       margin: 4px 0 0;
       color: var(--text-secondary);
       font-size: 13px;
+    }
+
+    .notes-header .notes-credit {
+      color: var(--primary-blue);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .notes-logo {
+      width: 150px;
+      height: auto;
+      flex: 0 0 auto;
+      object-fit: contain;
     }
 
     .notes-add-button,
@@ -217,9 +232,9 @@
     }
 
     .notes-column-action {
-      width: 68px !important;
-      min-width: 68px;
-      max-width: 68px;
+      width: 88px !important;
+      min-width: 88px;
+      max-width: 88px;
       padding-left: 4px;
       padding-right: 4px;
       text-align: center;
@@ -252,9 +267,62 @@
         max-height: calc(100vh - 230px);
       }
 
+      .notes-table-wrap {
+        overflow-x: hidden;
+      }
+
+      .notes-table {
+        min-width: 0;
+      }
+
+      .notes-table thead {
+        display: none;
+      }
+
+      .notes-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        width: 100%;
+        padding: 10px;
+      }
+
+      .notes-table tbody td {
+        width: auto !important;
+        min-width: 0;
+        padding: 0;
+        border-bottom: 0;
+      }
+
+      .notes-table tbody td:first-child,
+      .notes-table tbody td:nth-child(2),
+      .notes-table tbody td:nth-child(3) {
+        grid-column: 1 / -1;
+      }
+
+      .notes-table tbody td:first-child {
+        padding-bottom: 2px;
+      }
+
+      .notes-table tbody td input {
+        width: 100%;
+      }
+
+      .notes-table tbody td button {
+        width: 100% !important;
+        padding-left: 4px;
+        padding-right: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
       .notes-header {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .notes-logo {
+        align-self: flex-end;
       }
 
       .notes-header h1 {
@@ -277,7 +345,9 @@
       <div>
         <h1>Sagi Notes</h1>
         <p>Shared notes and assessment links</p>
+        <p class="notes-credit">Created by Richiel Cana</p>
       </div>
+      <img class="notes-logo" src="logo.png" alt="Sagility">
     </header>
 
     <div class="notes-actions">
