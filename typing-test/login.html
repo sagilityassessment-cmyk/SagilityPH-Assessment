@@ -46,6 +46,10 @@
     } else if ([...locationSelect.options].some(option => option.value === savedLocation)) {
       locationSelect.value = savedLocation;
     }
+    const remoteOption = document.createElement('option');
+    remoteOption.value = 'Remote';
+    remoteOption.textContent = 'Remote';
+    seatNumberSelect.appendChild(remoteOption);
     for (let seat = 1; seat <= 30; seat += 1) {
       const option = document.createElement('option');
       option.value = String(seat);
