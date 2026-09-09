@@ -196,15 +196,7 @@
               <input id="followAssessmentCheckbox" type="checkbox">
               Click here if Follow Assessment
             </label>
-            <button id="sendEmailBtn" class="send-email-btn" type="button">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
-                <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-              </svg>
-              Send Email
-            </button>
           </div>
-          <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
         </div>
       </section>
 
@@ -214,11 +206,26 @@
             <circle cx="12" cy="12" r="9"></circle>
             <polyline points="12 7 12 12 15 14"></polyline>
           </svg>
-          <h2>Data Delivery History</h2>
+          <h2>Preview Email</h2>
         </div>
-        <input id="recentHistorySearchInput" class="history-search-input" type="search" placeholder="Search name, email, or location">
-        <ol id="recentSentHistoryList" class="sent-history-list"></ol>
-        <button id="deleteRecentHistoryBtn" class="history-delete-selected" type="button" disabled>Delete</button>
+        <div class="email-preview" aria-label="Email preview">
+          <div class="email-preview-heading">Candidate email preview</div>
+          <div id="emailPreviewSubject" class="email-preview-subject">Subject: Complete the fields and select a package</div>
+          <div id="emailPreviewBody" class="email-preview-body">The email preview will appear here.</div>
+        </div>
+        <div class="preview-email-action">
+          <p id="emailStatus" class="email-status" role="status" aria-live="polite"></p>
+          <button id="sendEmailBtn" class="send-email-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 6l2.29 2.29-4.29 4.29 4.29 4.29L16 18l-6-6 6-6z"></path>
+              <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Send Email
+          </button>
+        </div>
+        <input id="recentHistorySearchInput" type="hidden">
+        <ol id="recentSentHistoryList" hidden></ol>
+        <button id="deleteRecentHistoryBtn" type="button" hidden disabled>Delete</button>
       </section>
 
     </div>
@@ -1965,6 +1972,61 @@
         persistState();
       });
     });
+
+    function renderEmailPreview() {
+      const name = document.getElementById('candidateNameInput').value.trim() || 'Candidate';
+      const location = document.getElementById('locationInput').value.trim() || 'Location';
+      const retake = document.getElementById('retakeCheckbox').checked;
+      const followUp = document.getElementById('followAssessmentCheckbox').checked;
+      const prefix = followUp ? 'Sagility Assessment Follow Up_' : retake ? 'Sagility Assessment Retake_' : 'Sagility Assessment_';
+      const packages = getOrderedSelectedPackageCheckboxes();
+      const packageLinks = packages.map(checkbox =>
+        `<li><strong>${escapeHtml(checkbox.dataset.package)}</strong>: <a href="${escapeHtml(checkbox.dataset.url)}">Click here</a></li>`
+      ).join('');
+      const introduction = followUp
+        ? '<p>I would like to follow up on your assessment completion. Kindly complete the assessments below at your earliest convenience:</p>'
+        : retake
+          ? '<p>Sorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.</p>'
+          : '<p>Good Day!</p><p>Please click link/s below to start your assessment.</p>';
+      const notificationUrl = 'https://sagilityassessment-cmyk.github.io/SagilityPH-Assessment/candidate.html';
+      const meetingUrl = 'https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWUyMzUzYzYtNTgxYS00ZWVhLWJjN2UtNTA4YWM2Mzg1Zjdk%40thread.v2/0?context=%7b%22Tid%22%3a%22c0745124-84a4-4909-bb95-307ad5a8ae15%22%2c%22Oid%22%3a%22e7eb26f1-7544-4bac-bfac-c4674034791e%22%7d';
+      const body = `<p>Hi ${escapeHtml(name)},</p>
+        ${introduction}
+        <ol>${packageLinks || '<li>No packages selected</li>'}</ol>
+        <h3>Note:</h3>
+        <p>If you have completed your assessment, please click the link below to notify our Test Admin that you have finished your assessment.</p>
+        <p><strong>Notify Test Admin:</strong> <a href="${notificationUrl}">Click here</a></p>
+        <p>Once notified, our Test Admin will review your assessment status and proceed with checking your results.</p>
+        <h3>Before You Start:</h3>
+        <ul>
+          <li>We recommend using a laptop or desktop computer and a headset for the best experience. However, if a laptop or desktop computer is not available, you may use your mobile device to complete the assessment.</li>
+          <li>Make sure you are in a quiet environment.</li>
+          <li>Use your active email address and enter the security code when prompted.</li>
+          <li>Read all instructions carefully before taking the assessment.</li>
+        </ul>
+        <h3>Need Assistance?</h3>
+        <p>If you need assistance, you may join our Virtual Assessment session so we can guide you on how to take your assessment or provide any necessary follow-ups.</p>
+        <p>Time: 11am-8pm MNL<br>Link: <a href="${meetingUrl}">Meeting Invite</a><br>Meeting ID: 479 656 747 406 7<br>Passcode: vi3nV3NB</p>
+        <h3>Important Reminders:</h3>
+        <ul>
+          <li>⚠️ Use the assessment link only once.</li>
+          <li>🔒 Do not share or forward the link.</li>
+          <li>📍 The system records IP address and location.</li>
+          <li>📇 Assessment materials are confidential. Any misuse may affect your application.</li>
+        </ul>
+        <p>For questions or assistance, please contact:<br><a href="mailto:PHLTestAdmin@Sagilityhealth.com">PHLTestAdmin@Sagilityhealth.com</a></p>
+        <p>Thank you, and good luck with your assessment!</p>
+        <p><strong>Best Regards,<br>Talent Acquisition- Sagility Recruitment - Test Admin<br>${escapeHtml(location)}</strong></p>`;
+      document.getElementById('emailPreviewSubject').textContent = `Subject: ${prefix}${name}_${location}`;
+      document.getElementById('emailPreviewBody').innerHTML = body;
+    }
+
+    ['candidateNameInput', 'emailInput', 'locationInput', 'retakeCheckbox', 'followAssessmentCheckbox'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderEmailPreview);
+      document.getElementById(id).addEventListener('change', renderEmailPreview);
+    });
+    document.querySelectorAll('.package-checkbox').forEach(checkbox => checkbox.addEventListener('change', renderEmailPreview));
+    renderEmailPreview();
 
     document.getElementById('sendEmailBtn').addEventListener('click', async () => {
       const sendButton = document.getElementById('sendEmailBtn');
