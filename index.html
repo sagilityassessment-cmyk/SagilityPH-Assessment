@@ -89,7 +89,7 @@
         </svg>
         Sagility Files
       </a>
-      <a href="https://sagilityassessment-cmyk.github.io/SagilityPH-Assessment/assessment-instructions.html" target="_blank" rel="noopener noreferrer">
+      <a href="assessment-instructions.html" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M6 3h9l3 3v15H6z"></path>
           <path d="M9 11h6M9 15h6M9 7h3"></path>
@@ -2010,7 +2010,7 @@
         : retake
           ? '<p>Sorry to inform you that you did not achieve the required assessment score(s) on one or more of the tests below. Please click the link(s) below to retake your assessment.</p>'
           : '<p>Good Day!</p><p>Please click link/s below to start your assessment.</p>';
-      const notificationUrl = 'https://sagilityassessment-cmyk.github.io/SagilityPH-Assessment/candidate.html';
+      const notificationUrl = 'https://assessmentportal.sagilife.online/candidate.html';
       const meetingUrl = 'https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWUyMzUzYzYtNTgxYS00ZWVhLWJjN2UtNTA4YWM2Mzg1Zjdk%40thread.v2/0?context=%7b%22Tid%22%3a%22c0745124-84a4-4909-bb95-307ad5a8ae15%22%2c%22Oid%22%3a%22e7eb26f1-7544-4bac-bfac-c4674034791e%22%7d';
       const body = `<p>Hi ${escapeHtml(name)},</p>
         ${introduction}

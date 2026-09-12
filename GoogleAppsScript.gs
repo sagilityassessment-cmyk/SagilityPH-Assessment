@@ -12,7 +12,7 @@ const MEETING_TIME = '11am-8pm MNL';
 const MEETING_LINK = 'https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWUyMzUzYzYtNTgxYS00ZWVhLWJjN2UtNTA4YWM2Mzg1Zjdk%40thread.v2/0?context=%7b%22Tid%22%3a%22c0745124-84a4-4909-bb95-307ad5a8ae15%22%2c%22Oid%22%3a%22e7eb26f1-7544-4bac-bfac-c4674034791e%22%7d';
 const MEETING_ID = '479 656 747 406 7';
 const MEETING_PASSCODE = 'vi3nV3NB';
-const CANDIDATE_NOTIFICATION_URL = 'https://sagilityassessment-cmyk.github.io/SagilityPH-Assessment/candidate.html';
+const CANDIDATE_NOTIFICATION_URL = 'https://assessmentportal.sagilife.online/candidate.html';
 
 function doPost(e) {
   try {
