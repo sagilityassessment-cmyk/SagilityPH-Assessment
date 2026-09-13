@@ -1,12 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="portal-login-locked">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sagility Assessment</title>
-  <link rel="stylesheet" href="style.css?v=typing-filters-2">
+  <title>Sagility Recruiter and Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=mobile-header-1">
 </head>
-<body>
+<body class="portal-locked">
+  <main id="portalLoginView" class="portal-login-view" aria-labelledby="portalLoginTitle">
+    <section class="portal-login-card">
+      <img class="portal-login-logo" src="logo.png" alt="Sagility">
+      <h1 id="portalLoginTitle">AssessmentPH <em>Portal</em></h1>
+      <p>Sign in to access the recruiter and admin portal.</p>
+      <form id="portalLoginForm">
+        <label for="portalLoginEmail">Company email</label>
+        <input id="portalLoginEmail" type="email" autocomplete="username" required>
+        <label for="portalLoginPassword">Password</label>
+        <input id="portalLoginPassword" type="password" autocomplete="current-password" required>
+        <button type="submit" class="portal-login-submit">Log in <span aria-hidden="true">↗</span></button>
+        <button type="button" id="portalResetPassword" class="portal-reset-password">Reset password by email</button>
+        <p id="portalLoginMessage" role="alert"></p>
+      </form>
+    </section>
+  </main>
   <div id="emailStatusPopup" class="email-status-popup hidden" role="status" aria-live="polite">
     <div class="email-status-popup-card">
       <button id="closeEmailStatusPopup" class="email-status-popup-close" type="button" aria-label="Close email status">&times;</button>
@@ -112,7 +131,7 @@
       </a>
       <div class="location-control-wrap">
         <div id="locationReminderBubble" class="typing-chart-hint location-reminder-bubble" role="status">Please note: choose your location</div>
-        <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" required autocomplete="off">
+        <select class="header-location-select" id="headerLocationSelect" aria-label="Select location" autocomplete="off">
           <option value="" disabled hidden selected>Location</option>
           <option value="Iloilo City">Iloilo City</option>
           <option value="Bohol">Bohol</option>
@@ -122,7 +141,24 @@
         </select>
       </div>
     </nav>
+    <button id="logoutBtn" class="logout-btn" type="button" aria-label="Log out">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M10 17l5-5-5-5"></path>
+        <path d="M15 12H3"></path>
+        <path d="M21 3v18"></path>
+      </svg>
+      Log out
+    </button>
   </header>
+
+  <script>
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('sagility-assessment-state');
+      localStorage.removeItem('sagility-selected-location');
+      sessionStorage.clear();
+      window.location.replace('./index.html');
+    });
+  </script>
 
   <!-- MAIN CONTENT GRID -->
   <main class="grid">
@@ -163,7 +199,7 @@
           </svg>
           Location
         </label>
-        <select id="locationInput" required>
+        <select id="locationInput">
           <option value="" disabled selected hidden>Select Location</option>
           <option>Iloilo City</option>
           <option>Bohol</option>
@@ -755,6 +791,7 @@
     const savedLocation = localStorage.getItem(LOCATION_STORAGE_KEY) || '';
     headerLocationSelect.value = savedLocation;
     locationInput.value = savedLocation;
+
     window.setTimeout(() => locationReminderBubble.classList.add('is-visible'), 350);
     window.setTimeout(() => locationReminderBubble.classList.remove('is-visible'), 5000);
 
@@ -763,6 +800,8 @@
       localStorage.setItem(LOCATION_STORAGE_KEY, headerLocationSelect.value);
       locationInput.value = headerLocationSelect.value;
       updateTypingTestLink();
+      updateSelectedPackages();
+      renderEmailPreview();
       locationInput.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
@@ -795,6 +834,68 @@
       appId: '1:879192858532:web:39e190eb2b130998df6b31',
       measurementId: 'G-QHND2XY4ZR'
     };
+
+    const portalLoginApp = firebase.initializeApp(firebaseConfig, 'portal-login');
+    const portalAuth = portalLoginApp.auth();
+    const portalSessionKey = 'assessment-portal-authenticated';
+    const portalSessionStartedKey = 'assessment-portal-session-started';
+    const portalSessionDuration = 5 * 60 * 60 * 1000;
+    const portalLoginView = document.getElementById('portalLoginView');
+    const portalLoginForm = document.getElementById('portalLoginForm');
+    const portalLoginMessage = document.getElementById('portalLoginMessage');
+    const portalLoginButton = portalLoginForm.querySelector('.portal-login-submit');
+
+    function unlockAssessmentPortal() {
+      document.body.classList.remove('portal-locked');
+      document.documentElement.classList.remove('portal-login-locked');
+      portalLoginView.remove();
+    }
+
+    const portalSessionStarted = Number(sessionStorage.getItem(portalSessionStartedKey));
+    if (sessionStorage.getItem(portalSessionKey) === 'true'
+      && Number.isFinite(portalSessionStarted)
+      && Date.now() - portalSessionStarted < portalSessionDuration) {
+      unlockAssessmentPortal();
+    } else {
+      sessionStorage.removeItem(portalSessionKey);
+      sessionStorage.removeItem(portalSessionStartedKey);
+      document.documentElement.classList.add('portal-login-locked');
+    }
+
+    document.getElementById('portalResetPassword').addEventListener('click', async () => {
+      const email = document.getElementById('portalLoginEmail').value.trim().toLowerCase();
+      if (!email) {
+        portalLoginMessage.textContent = 'Enter your company email first.';
+        return;
+      }
+      try {
+        await portalAuth.sendPasswordResetEmail(email);
+        portalLoginMessage.className = 'is-success';
+        portalLoginMessage.textContent = 'Password reset email sent. Check your inbox.';
+      } catch {
+        portalLoginMessage.className = '';
+        portalLoginMessage.textContent = 'Unable to send the reset email. Check the email address.';
+      }
+    });
+
+    portalLoginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = document.getElementById('portalLoginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('portalLoginPassword').value;
+      portalLoginMessage.textContent = '';
+      portalLoginButton.disabled = true;
+      portalLoginButton.firstChild.textContent = 'Signing in... ';
+      try {
+        await portalAuth.signInWithEmailAndPassword(email, password);
+        sessionStorage.setItem(portalSessionKey, 'true');
+        sessionStorage.setItem(portalSessionStartedKey, String(Date.now()));
+        unlockAssessmentPortal();
+      } catch {
+        portalLoginMessage.textContent = 'Incorrect email or password.';
+        portalLoginButton.disabled = false;
+        portalLoginButton.firstChild.textContent = 'Log in ';
+      }
+    });
 
     firebase.initializeApp(firebaseConfig);
     const firestore = firebase.firestore();
@@ -1036,6 +1137,7 @@
       });
 
       updateSelectedPackages();
+      renderEmailPreview();
       renderSentHistory(document.getElementById('historySearchInput')?.value || '');
       renderRecentSentHistory(document.getElementById('recentHistorySearchInput')?.value || '');
       renderReports();
@@ -1226,7 +1328,9 @@
           e.preventDefault();
           checkbox.checked = false;
           updateSelectedPackages();
+          renderEmailPreview();
           updatePackageItemUI(checkbox);
+          persistState();
         });
       });
 
@@ -1991,6 +2095,7 @@
       checkbox.addEventListener('change', function() {
         updatePackageItemUI(this);
         updateSelectedPackages();
+        renderEmailPreview();
         persistState();
       });
     });

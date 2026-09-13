@@ -37,6 +37,184 @@
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+html.portal-login-locked {
+  overflow: hidden;
+}
+
+body.portal-locked > :not(#portalLoginView) {
+  display: none;
+}
+
+body.portal-locked {
+  padding: 0;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.portal-login-view {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  min-width: 320px;
+  padding: 24px;
+  overflow: hidden;
+  color: #16382e;
+  background: linear-gradient(125deg, #103b73, #2c78bd 48%, #9dd4f2);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.portal-login-view::before,
+.portal-login-view::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  opacity: .7;
+  transform: rotate(22deg);
+}
+
+.portal-login-view::before {
+  width: 46vw;
+  height: 46vw;
+  max-width: 620px;
+  max-height: 620px;
+  top: -20vw;
+  right: -10vw;
+  background: rgba(166, 220, 247, .62);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.portal-login-view::after {
+  width: 34vw;
+  height: 34vw;
+  left: -8vw;
+  bottom: -14vw;
+  background: rgba(12, 54, 105, .48);
+  clip-path: polygon(0 0, 100% 20%, 80% 100%, 20% 80%);
+}
+
+.portal-login-card {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  padding: clamp(28px, 5vw, 52px);
+  border-radius: 24px;
+  background: #fbfaf4;
+  box-shadow: 0 24px 80px rgba(5, 45, 32, .16);
+}
+
+.portal-login-logo {
+  display: block;
+  width: min(220px, 100%);
+  height: auto;
+  margin: 0 auto 24px;
+  object-fit: contain;
+}
+
+.portal-login-card h1 {
+  margin: 18px 0 10px;
+  color: #16382e;
+  font: 800 clamp(30px, 4.5vw, 48px)/1 Manrope, sans-serif;
+  letter-spacing: -.05em;
+}
+
+.portal-login-card h1 em {
+  color: #1f4fa3;
+  font-style: normal;
+}
+
+.portal-login-card > p {
+  margin: 0 0 25px;
+  color: #6b8278;
+}
+
+.portal-login-card label {
+  display: block;
+  margin-bottom: 8px;
+  color: #16382e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.portal-login-card input {
+  width: 100%;
+  margin-bottom: 17px;
+  padding: 13px 15px;
+  border: 1px solid #dce7df;
+  border-radius: 10px;
+  outline: none;
+  color: #16382e;
+  background: #fff;
+  font: inherit;
+}
+
+.portal-login-card input:focus {
+  border-color: #4d7cff;
+  box-shadow: 0 0 0 3px rgba(77, 124, 255, .15);
+}
+
+body .portal-login-card button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 47px;
+  margin-top: 6px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: #1f4fa3;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body .portal-login-card button:hover {
+  background: #173d85;
+}
+
+body .portal-login-card .portal-reset-password {
+  display: block;
+  width: auto;
+  min-height: 0;
+  margin: 14px auto 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: #1f4fa3;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+body .portal-login-card .portal-reset-password:hover {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+#portalLoginMessage {
+  min-height: 22px;
+  margin: 14px 0 0;
+  color: #c14e43;
+  font-size: 13px;
+}
+
+#portalLoginMessage.is-success {
+  color: #1f4fa3;
+}
+
+@media (max-width: 520px) {
+  .portal-login-view { padding: 20px; }
+  .portal-login-card { padding: 20px; border-radius: 18px; }
+  .portal-login-logo { width: min(190px, 100%); margin-bottom: 16px; }
+  .portal-login-card h1 { margin-top: 10px; }
+}
+
 /* ===== GLOBAL STYLES ===== */
 * {
   box-sizing: border-box;
@@ -44,6 +222,8 @@
 
 html, body {
   width: 100%;
+  margin: 0;
+  padding: 0;
   scroll-behavior: smooth;
   overflow-x: hidden;
 }
@@ -548,6 +728,38 @@ nav a svg {
 nav a:hover {
   color: var(--accent-blue);
   background: var(--bg-hover);
+}
+
+.logout-btn {
+  position: relative;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid rgba(31, 79, 163, 0.35);
+  border-radius: 9px;
+  color: #1f4fa3;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.logout-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.logout-btn:hover {
+  color: #173d85;
+  background: #dceeff;
+  transform: translateY(-1px);
 }
 
 nav a[href*="assessment-instructions"] {
@@ -2560,7 +2772,7 @@ button {
   font-family: inherit;
 }
 
-button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.notes-add-button):not(.notes-click-button):not(.notes-save-button):not(.notes-delete-button):not(.typing-chart-toggle) {
+button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.notes-add-button):not(.notes-click-button):not(.notes-save-button):not(.notes-delete-button):not(.typing-chart-toggle):not(.portal-login-submit):not(.portal-reset-password):not(.logout-btn) {
   width: 100%;
   padding: 16px 20px;
   border: none;
@@ -2573,12 +2785,12 @@ button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-btn):not(.histo
   transition: all 0.2s ease;
 }
 
-button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):hover {
+button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.portal-login-submit):not(.portal-reset-password):not(.logout-btn):hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(57, 184, 255, 0.3);
 }
 
-button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):active {
+button:not(.send-email-btn):not(.pkg-remove):not(.history-delete-selected):not(.notification-search-button):not(.seat-call-button):not(.seat-manager-action):not(.portal-login-submit):not(.portal-reset-password):not(.logout-btn):active {
   transform: translateY(0);
 }
 
